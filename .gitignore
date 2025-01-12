@@ -1,0 +1,31 @@
+.idea/
+# IDE
+.vscode/
+.DS_STORE
+/coverage/
+# Vendor
+/vendor/
+# Logs
+/app/logs/*
+!/app/logs/README.md
+# Cache
+/var/cache/*
+.phpunit.result.cache
+cache.properties
+.php_cs.cache
+# Composer
+composer.phar
+composer.lock
+
+toubeelib.env
+toubeelibdb.env
+
+vendor/
+
+# Ignore all log files
+/app/logs/*.log
+
+auth.ini
+patient.ini
+praticien.ini
+rdv.ini
