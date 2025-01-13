@@ -31,9 +31,8 @@ return function( \Slim\App $app):\Slim\App {
     $app->post('/rdvs', \toubeelib\application\actions\CreateRdvAction::class)
     ->setName('create_rdv');
 
-//c'est la seule qui ne marche pas pour l'instant
-    $app->get('/praticiens/{id}/agenda', \toubeelib\application\actions\GetPlanningByPraticienAction::class)
-    ->setName('get_agenda_by_praticien');
+    $app->get('/praticiens/{praticien_id}/planning', \toubeelib\application\actions\GetPlanningByPraticienAction::class)
+    ->setName('praticien_planning');
 
     //micro-service authentification
 

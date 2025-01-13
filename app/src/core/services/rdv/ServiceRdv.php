@@ -8,7 +8,7 @@ use toubeelib\core\domain\entities\rdv\Rdv;
 //dto
 use toubeelib\core\dto\rdv\CalendarRdvDTO;
 use toubeelib\core\dto\rdv\CreateRdvDTO;
-use toubeelib\core\dto\rdv\DisponibilityPraticienRdvDTO;
+use toubeelib\core\dto\rdv\PlanningPraticienDTO;
 use toubeelib\core\dto\rdv\RdvDTO;
 //interfaces
 use toubeelib\core\services\rdv\ServiceRdvInterface;
@@ -88,7 +88,7 @@ class ServiceRdv implements ServiceRdvInterface
 
     }
 
-    public function getDisponibilityPraticienRdv(DisponibilityPraticienRdvDTO $disponibilityPraticienRDVDto): array
+    public function getPlanningByPraticien(PlanningPraticienDTO $disponibilityPraticienRDVDto): array
     {
         try{
             $rdvs = $this->rdvRepository->getRdvByPraticienId($disponibilityPraticienRDVDto->idPraticien);

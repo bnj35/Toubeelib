@@ -1,23 +1,23 @@
 <?php
 
-namespace toubeelib\core\dto\rendez_vous;
+namespace toubeelib\core\dto\rdv;
 
 use toubeelib\core\dto\DTO;
 
-class DisponibilityPraticienRendezVousDTO extends DTO
+class PlanningPraticienDTO extends DTO
 {
 
-    protected string $PraticienId;
-    protected \DateTimeImmutable $start;
-    protected \DateTimeImmutable $end;
-    protected int $duration;
+    protected string $idPraticien;
+    protected \DateTimeImmutable $dateDebut;
+    protected \DateTimeImmutable $dateFin;
+    protected int $duree;
 
-    public function __construct(string $PraticienId, \DateTimeImmutable $start, \DateTimeImmutable $end , int $duration)
+    public function __construct(string $idPraticien, \DateTimeImmutable $dateDebut, \DateTimeImmutable $dateFin , int $duree)
     {
-        $this->PraticienId = $PraticienId;
-        $this->start = $start;
-        $this->end = $end;
-        $this->duration = $duration;
+        $this->idPraticien = $idPraticien;
+        $this->dateDebut = $dateDebut;
+        $this->dateFin = $dateFin;
+        $this->duree = $duree;
     }
 
 

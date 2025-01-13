@@ -13,7 +13,7 @@ use Slim\Routing\RouteContext;
 //renderer
 use toubeelib\application\renderer\JsonRenderer;
 //DTO
-use toubeelib\core\dto\rdv\DisponibilityPraticienRdvDTO;
+use toubeelib\core\dto\rdv\PlanningPraticienDTO;
 //services
 use toubeelib\core\services\rdv\RdvBadDataException;
 use toubeelib\core\services\rdv\RdvInternalServerError;
@@ -36,7 +36,6 @@ class GetPlanningByPraticienAction extends AbstractAction
             $end = $rq->getQueryParams()['end'] ?? null;
             $duration = $rq->getQueryParams()['duration'] ?? null;
 
-
             if ($start === null || $end === null || $duration === null) {
                 throw new HttpNotFoundException($rq, 'Paramètres manquants');
             }
@@ -44,20 +43,28 @@ class GetPlanningByPraticienAction extends AbstractAction
             $start = urldecode($start);
             $end = urldecode($end);
 
-            $praticienId = $args['praticienId'];
+            $praticienId = $args['praticien_id'];
+
+            $start = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $start);
+            $end = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $end);
+
+            if ($start === false || $end === false) {
+                throw new HttpBadRequestException($rq, 'Invalid date format');
+            }
+
             $dto = new PlanningPraticienDTO(
                 $praticienId,
-                \DateTimeImmutable::createFromFormat('Y-m-d H:i', $start),
-                \DateTimeImmutable::createFromFormat('Y-m-d H:i', $end),
+                $start,
+                $end,
                 (int)$duration
             );
 
             $routeContext = RouteContext::fromRequest($rq);
             $routeParser = $routeContext->getRouteParser();
-            $urlPraticien = $routeParser->urlFor('praticienId', ['praticien_id' => $praticienId]);
-            $urlDispobilites = $routeParser->urlFor('praticien_id_planning', ['praticien_id' => $praticienId]);
+            $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $praticienId]);
+            $urlDispobilites = $routeParser->urlFor('praticien_planning', ['praticien_id' => $praticienId]);
 
-            $disponibilities = $this->RdvServiceInterface->getDisponibilityPraticienRdv($dto);
+            $disponibilities = $this->RdvServiceInterface->getPlanningByPraticien($dto);
             $result = [
                 "type" => "collection",
                 "locale" => "fr-FR",
