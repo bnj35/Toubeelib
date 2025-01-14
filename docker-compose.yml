@@ -32,7 +32,7 @@ services:
     ports:
       - '6081:80'
     volumes:
-      - ./app/praticien:/var/php
+      - ./appPraticien:/var/php
     working_dir: /var/php
     networks:
       - toubeelib.net
@@ -49,7 +49,7 @@ services:
     ports:
       - '6082:80'
     volumes:
-      - ./app/rdv:/var/php
+      - ./appRdv:/var/php
     working_dir: /var/php
     networks:
       - toubeelib.net
@@ -66,7 +66,7 @@ services:
     ports:
       - '6083:80'
     volumes:
-      - ./app/user:/var/php
+      - ./appUser:/var/php
     working_dir: /var/php
     networks:
       - toubeelib.net
