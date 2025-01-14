@@ -2,7 +2,6 @@
 
 namespace toubeelib\core\services\rdv;
 
-use toubeelib\core\dto\rdv\CalendarRdvDTO;
 use toubeelib\core\dto\rdv\CancelRdvDTO;
 use toubeelib\core\dto\rdv\CreateRdvDTO;
 use toubeelib\core\dto\rdv\PlanningPraticienDTO;
@@ -19,8 +18,5 @@ interface ServiceRdvInterface
     public function getPlanningByPraticien(PlanningPraticienDTO $disponibilityPraticienRDVDto): array;
 
     public function getRdvByPraticienId(string $id): array;
-
-    public function getCalendarRdvByPraticien(CalendarRdvDTO $calendarRdvDTO): array;
-
 
 }

@@ -35,7 +35,7 @@ use toubeelib\core\services\auth\ServiceAuthorizationPraticien;
 use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
-use toubeelib\application\Provider\JWTManager; // Correct namespace
+use toubeelib\application\Provider\JWTManager;
 
 return [
     //log 
