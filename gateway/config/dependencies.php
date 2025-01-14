@@ -36,6 +36,7 @@ use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
+use GuzzleHttp\Client;
 
 return [
 
@@ -81,7 +82,7 @@ return [
     //guzzle client 
 
     Client::class => function (ContainerInterface $c) {
-        return new Client(['base_uri' => 'http://localhost:6080',]);
+        return new Client(['base_uri' => 'http://api.toubeelib/']);
     },
 
     //Repositories
