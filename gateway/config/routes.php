@@ -4,8 +4,9 @@ declare(strict_types=1);
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;
+use GuzzleHttp\Client;
 
-return function( \Slim\App $app):\Slim\App {
+return function(App $app):App {
 
     $app->get('/', \toubeelib\application\actions\HomeAction::class);
 
@@ -14,8 +15,13 @@ return function( \Slim\App $app):\Slim\App {
     $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
     ->setName('praticienId');
 
-    $app->get('/praticiens', \toubeelib\application\actions\GetPraticienAction::class)
-    ->setName('praticiens');
+    $app->get('/praticiens', function (Request $request, Response $response) use ($app) {
+        $client = $app->getContainer()->get(Client::class);
+        $apiResponse = $client->get('/praticiens');
+
+        $response->getBody()->write($apiResponse->getBody()->getContents());
+        return $response->withHeader('Content-Type', 'application/json');
+    });
 
     $app->post('/praticiens', \toubeelib\application\actions\CreatePraticienAction::class)
     ->setName('create_praticien');

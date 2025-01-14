@@ -35,9 +35,10 @@ use toubeelib\core\services\auth\ServiceAuthorizationPraticien;
 use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
-use toubeelib\application\Provider\JWTManager; // Correct namespace
+use toubeelib\application\Provider\JWTManager;
 
 return [
+
     //log 
     'log.prog.level' => \Monolog\Level::Debug,
     'log.prog.name' => 'toubeelib.program.log',
@@ -77,6 +78,11 @@ return [
         return $praticienPdo;
     },
 
+    //guzzle client 
+
+    Client::class => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://localhost:6080',]);
+    },
 
     //Repositories
     
