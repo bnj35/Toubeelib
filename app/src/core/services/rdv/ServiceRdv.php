@@ -6,7 +6,6 @@ use Psr\Log\LoggerInterface;
 //entities
 use toubeelib\core\domain\entities\rdv\Rdv;
 //dto
-use toubeelib\core\dto\rdv\CalendarRdvDTO;
 use toubeelib\core\dto\rdv\CreateRdvDTO;
 use toubeelib\core\dto\rdv\PlanningPraticienDTO;
 use toubeelib\core\dto\rdv\RdvDTO;
@@ -88,16 +87,19 @@ class ServiceRdv implements ServiceRdvInterface
 
     }
 
-    public function getPlanningByPraticien(PlanningPraticienDTO $disponibilityPraticienRDVDto): array
+    public function getPlanningByPraticien(PlanningPraticienDTO $PlanningRdvDTO): array
     {
-        try{
-            $rdvs = $this->rdvRepository->getRdvByPraticienId($disponibilityPraticienRDVDto->idPraticien);
-            $disponibility = [];
-            if ($disponibilityPraticienRDVDto->dateDebut > $disponibilityPraticienRDVDto->dateFin) {
+        try {
+            $rdvs = $this->rdvRepository->getRdvByPraticienId($PlanningRdvDTO->id);
+            var_dump($rdvs);
+            $planning = [];
+
+            if ($PlanningRdvDTO->date_debut > $PlanningRdvDTO->date_fin) {
                 throw new RdvBadDataException();
             }
-            $date = $disponibilityPraticienRDVDto->dateDebut;
-            while ($date < $disponibilityPraticienRDVDto->dateFin) {
+
+            $date = $PlanningRdvDTO->date_debut;
+            while ($date < $PlanningRdvDTO->date_fin) {
                 $isDispo = true;
                 foreach ($rdvs as $rdv) {
                     if ($rdv->getDate() == $date) {
@@ -106,17 +108,18 @@ class ServiceRdv implements ServiceRdvInterface
                     }
                 }
                 if ($isDispo && $date->format('H') >= 9 && $date->format('H') < 18) {
-                    $disponibility[] = $date;
+                    $planning[] = $date;
+                } else {
+                    $planning[] = $date->format('Y-m-d H:i:s') . " rdv already scheduled";
                 }
-                $date = $date->add(new \DateInterval('PT' . $disponibilityPraticienRDVDto->duree . 'M'));
+                $date = $date->add(new \DateInterval('PT' . $PlanningRdvDTO->duration . 'M'));
             }
-            return $disponibility;
+            return $planning;
         } catch (RepositoryEntityNotFoundException $e) {
             throw new RdvBadDataException($e->getMessage());
         } catch (RepositoryInternalServerError $e) {
             throw new RdvInternalServerError($e->getMessage());
         }
-
     }
 
     public function getRdvByPraticienId(string $id): array
@@ -129,23 +132,4 @@ class ServiceRdv implements ServiceRdvInterface
             throw new RdvInternalServerError($e->getMessage());
         }
     }
-
-    public function getCalendarRdvByPraticien(CalendarRdvDTO $calendarRdvDTO): array
-    {
-        try {
-            $rdvs = $this->rdvRepository->getRdvByPraticienId($calendarRdvDTO->id);
-            $calendar = [];
-            foreach ($rdvs as $rdv) {
-                if ($rdv->getDate() >= $calendarRdvDTO->date_debut && $rdv->getDate() <= $calendarRdvDTO->date_fin) {
-                    $calendar[] = new RdvDTO($rdv);
-                }
-            }
-            return $calendar;
-        } catch (RepositoryEntityNotFoundException $e) {
-            throw new RdvBadDataException($e->getMessage());
-        } catch (RepositoryInternalServerError $e) {
-            throw new RdvInternalServerError($e->getMessage());
-        }
-    }
-
 }
