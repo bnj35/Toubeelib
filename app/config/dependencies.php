@@ -80,19 +80,19 @@ return [
 
     //Repositories
     
-    AuthRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOAuthRepository($c->get('auth.pdo'));
-    },
-    RdvRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDORdvRepository($c->get('rdv.pdo'));
-    },
-    PatientRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPatientRepository($c->get('patient.pdo'));
-    },
+    // AuthRepositoryInterface::class => function (ContainerInterface $c) {
+    //     return new PDOAuthRepository($c->get('auth.pdo'));
+    // },
+    // RdvRepositoryInterface::class => function (ContainerInterface $c) {
+    //     return new PDORdvRepository($c->get('rdv.pdo'));
+    // },
+    // PatientRepositoryInterface::class => function (ContainerInterface $c) {
+    //     return new PDOPatientRepository($c->get('patient.pdo'));
+    // },
     
-    PraticienRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPraticienRepository($c->get('praticien.pdo'));
-    },
+    // PraticienRepositoryInterface::class => function (ContainerInterface $c) {
+    //     return new PDOPraticienRepository($c->get('praticien.pdo'));
+    // },
     
     
     //Services

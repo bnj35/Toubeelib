@@ -5,10 +5,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;
 use GuzzleHttp\Client;
-use Psr\Container\ContainerInterface;
 
-return function(App $app): App {
-    $container = $app->getContainer();
+return function(App $app):App {
 
     $app->get('/', \toubeelib\application\actions\HomeAction::class);
 
@@ -17,8 +15,7 @@ return function(App $app): App {
     $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
     ->setName('praticienId');
 
-    $app->get('/praticiens', function (Request $request, Response $response) use ($container) {
-        $client = $container->get(Client::class);
+    $app->get('/praticiens', function (Request $request, Response $response, Client $client) {
         $apiResponse = $client->get('/praticiens');
 
         $response->getBody()->write($apiResponse->getBody()->getContents());
