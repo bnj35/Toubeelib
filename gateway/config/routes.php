@@ -15,12 +15,8 @@ return function(App $app):App {
     $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
     ->setName('praticienId');
 
-    $app->get('/praticiens', function (Request $request, Response $response, Client $client) {
-        $apiResponse = $client->get('/praticiens');
-
-        $response->getBody()->write($apiResponse->getBody()->getContents());
-        return $response->withHeader('Content-Type', 'application/json');
-    });
+    $app->get('/praticiens', \toubeelib\application\actions\GatewayGetPraticienAction::class)
+    ->setName('praticiens');
 
     $app->post('/praticiens', \toubeelib\application\actions\CreatePraticienAction::class)
     ->setName('create_praticien');

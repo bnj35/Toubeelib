@@ -15,7 +15,6 @@ use toubeelib\infrastructure\repositories\ArrayPraticienRepository;
 use toubeelib\infrastructure\repositories\ArrayRdvRepository;
 use toubeelib\infrastructure\repositories\PatientRepository;
 use toubeelib\application\actions\CreatePraticienAction;
-use toubeelib\application\actions\GetPraticienAction;
 use toubeelib\application\actions\GetPraticienByIdAction;
 use toubeelib\application\actions\GetRdvAction;
 use toubeelib\application\actions\CreateRdvAction;
@@ -157,9 +156,9 @@ return [
         return new CreatePraticienAction($c->get(ServicePraticienInterface::class));
     },
 
-    GetPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPraticienAction($c->get(ServicePraticienInterface::class));
-    },
+    // GetPraticienAction::class => function (ContainerInterface $c) {
+    //     return new GetPraticienAction($c->get(ServicePraticienInterface::class));
+    // },
 
     //rdvs
     GetRdvAction::class => function (ContainerInterface $c) {
@@ -184,5 +183,11 @@ return [
             $c->get(ServiceAuthentificationInterface::class)
             
         );
+    },
+
+    //gateway
+
+    GatewayGetPraticienAction::class => function(ContainerInterface $c) {
+        return new GatewayGetPraticienAction($c->get(PraticienRepository::class));
     },
 ];
