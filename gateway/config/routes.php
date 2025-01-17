@@ -23,16 +23,16 @@ return function(App $app):App {
 
     //micro-service rdv
     
-    $app->get('patients/{id}', \toubeelib\application\actions\GetPatientByIdAction::class)
+    $app->get('patients/{id}', \toubeelib\application\actions\GatewayRdvAction::class)
     ->setName('patientId');
 
-    $app->get('/rdvs/{id}', \toubeelib\application\actions\GetRdvAction::class)
+    $app->get('/rdvs/{id}', \toubeelib\application\actions\GatewayRdvAction::class)
     ->setName('rdvId');
 
-    $app->post('/rdvs', \toubeelib\application\actions\CreateRdvAction::class)
+    $app->post('/rdvs', \toubeelib\application\actions\GatewayRdvAction::class)
     ->setName('create_rdv');
 
-    $app->get('/praticiens/{praticien_id}/planning', \toubeelib\application\actions\GetPlanningByPraticienAction::class)
+    $app->get('/praticiens/{praticien_id}/planning', \toubeelib\application\actions\GatewayRdvAction::class)
     ->setName('praticien_planning');
 
     //micro-service authentification

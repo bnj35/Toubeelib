@@ -36,8 +36,8 @@ use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
 use GuzzleHttp\Client;
-use toubeelib\application\actions\GatewayGetPraticienAction;
-use toubeelib\application\actions\GatewayGetPraticienByIdAction;
+use toubeelib\application\actions\GatewayPraticienAction;
+use toubeelib\application\actions\GatewayRdvAction;
 
 return [
 
@@ -81,23 +81,11 @@ return [
 
     //praticiens
 
-    GatewayGetPraticienAction::class => function(ContainerInterface $c) {
-        return new GatewayGetPraticienAction($c->get('praticien.client'));
-    },
-
-    GatewayGetPraticienByIdAction::class => function(ContainerInterface $c) {
-        return new GatewayGetPraticienByIdAction($c->get('praticien.client'));
-    },
-
     GatewayPraticienAction::class => function(ContainerInterface $c) {
         return new GatewayPraticienAction($c->get('praticien.client'));
     },
     
     //rdvs
-
-    GatewayGetRdvAction::class => function(ContainerInterface $c) {
-        return new GatewayGetRdvAction($c->get('rdv.client'));
-    },
 
     GatewayRdvAction::class => function(ContainerInterface $c) {
         return new GatewayRdvAction($c->get('rdv.client'));
