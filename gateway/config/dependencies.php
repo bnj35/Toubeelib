@@ -37,6 +37,7 @@ use toubeelib\application\Provider\JWTAuthProvider;
 use toubeelib\application\Provider\JWTManager;
 use GuzzleHttp\Client;
 use toubeelib\application\actions\GatewayGetPraticienAction;
+use toubeelib\application\actions\GatewayGetPraticienByIdAction;
 
 return [
 
@@ -82,6 +83,10 @@ return [
 
     GatewayGetPraticienAction::class => function(ContainerInterface $c) {
         return new GatewayGetPraticienAction($c->get('praticien.client'));
+    },
+
+    GatewayGetPraticienByIdAction::class => function(ContainerInterface $c) {
+        return new GatewayGetPraticienByIdAction($c->get('praticien.client'));
     },
     
     //rdvs

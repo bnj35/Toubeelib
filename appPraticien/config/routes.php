@@ -20,25 +20,5 @@ return function( \Slim\App $app):\Slim\App {
     $app->post('/praticiens', \toubeelib\application\actions\CreatePraticienAction::class)
     ->setName('create_praticien');
 
-    //micro-service rdv
-    
-    $app->get('patients/{id}', \toubeelib\application\actions\GetPatientByIdAction::class)
-    ->setName('patientId');
-
-    $app->get('/rdvs/{id}', \toubeelib\application\actions\GetRdvAction::class)
-    ->setName('rdvId');
-
-    $app->post('/rdvs', \toubeelib\application\actions\CreateRdvAction::class)
-    ->setName('create_rdv');
-
-    $app->get('/praticiens/{praticien_id}/planning', \toubeelib\application\actions\GetPlanningByPraticienAction::class)
-    ->setName('praticien_planning');
-
-    //micro-service authentification
-
-    $app->get('/signin', \toubeelib\application\actions\SignInAction::class)
-    ->setName('signin');
-    
-
     return $app;
 };

@@ -58,18 +58,7 @@ return [
         $authPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $authPdo;
     },
-    'rdv.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('rdv.ini'));
-        $rdvPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $rdvPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $rdvPdo;
-    },
-    'patient.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('patient.ini'));
-        $patientPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $patientPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $patientPdo;
-    },
+
     'praticien.pdo' => function (ContainerInterface $c) {
         $data = parse_ini_file($c->get('praticien.ini'));
         $praticienPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
@@ -79,17 +68,7 @@ return [
 
 
     //Repositories
-    
-    AuthRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOAuthRepository($c->get('auth.pdo'));
-    },
-    RdvRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDORdvRepository($c->get('rdv.pdo'));
-    },
-    PatientRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPatientRepository($c->get('patient.pdo'));
-    },
-    
+
     PraticienRepositoryInterface::class => function (ContainerInterface $c) {
         return new PDOPraticienRepository($c->get('praticien.pdo'));
     },
@@ -97,40 +76,12 @@ return [
     
     //Services
 
-    ServiceAuthentificationInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthentification(
-            $c->get(AuthRepositoryInterface::class),
-        );
-    },
-    ServiceAuthorizationRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationRdv(
-            $c->get(RdvRepositoryInterface::class)
-        );
-    },
-    ServiceAuthorizationPatientInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPatient();
-    },
-    ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPraticien();
-    },
-    ServiceRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceRdv(
-            $c->get(PraticienRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
-            $c->get(PatientRepositoryInterface::class),
-            $c->get('prog.logger')
-        );
-    },
+    // ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
+    //     return new ServiceAuthorizationPraticien();
+    // },
     ServicePraticienInterface::class => function (ContainerInterface $c) {
         return new ServicePraticien($c->get(PraticienRepositoryInterface::class));
     },
-    ServicePatientInterface::class => function (ContainerInterface $c) {
-        return new ServicePatient(
-            $c->get(PatientRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
-        );
-    },
-
     // Providers
     AuthProviderInterface::class => function (ContainerInterface $c) {
         return new JWTAuthProvider(
@@ -152,30 +103,5 @@ return [
 
     GetPraticienAction::class => function (ContainerInterface $c) {
         return new GetPraticienAction($c->get(ServicePraticienInterface::class));
-    },
-
-    //rdvs
-    GetRdvAction::class => function (ContainerInterface $c) {
-        return new GetRdvAction($c->get(ServiceRdvInterface::class));
-    },
-
-    CreateRdvAction::class => function (ContainerInterface $c) {
-        return new CreateRdvAction(
-            $c->get(ServiceRdvInterface::class),
-        );
-    },
-
-    GetPlanningByPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPlanningByPraticienAction($c->get(ServiceRdvInterface::class));
-    },
-
-    //auth
-
-    SignInAction::class => function (ContainerInterface $c) {
-        return new SignInAction(
-            $c->get(AuthProviderInterface::class),
-            $c->get(ServiceAuthentificationInterface::class)
-            
-        );
     },
 ];

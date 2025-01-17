@@ -12,7 +12,7 @@ return function(App $app):App {
 
     //micro-service praticien
 
-    $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
+    $app->get('/praticiens/{id}', \toubeelib\application\actions\GatewayGetPraticienByIdAction::class)
     ->setName('praticienId');
 
     $app->get('/praticiens', \toubeelib\application\actions\GatewayGetPraticienAction::class)

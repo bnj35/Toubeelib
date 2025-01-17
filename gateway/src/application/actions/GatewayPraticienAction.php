@@ -7,8 +7,16 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 
+use toubeelib\application\actions\AbstractGatewayAction;
+
 class GatewayPraticienAction extends AbstractGatewayAction
 {
+
+    public __construct(Client $client)
+    {
+        $this->client = $client;
+    }
+
 public function __invoke(ServerRequestInterface $request): ResponseInterface
 {
 $method = $request->getMethod();
