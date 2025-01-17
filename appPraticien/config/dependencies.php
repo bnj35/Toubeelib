@@ -1,40 +1,15 @@
 <?php
 
 use Psr\Container\ContainerInterface;
-use toubeelib\core\repositories\AuthRepositoryInterface;
+use toubeelib\core\repositoryInterfaces\PraticienRepositoryInterface;
+use toubeelib\infrastructure\db\PDOPraticienRepository;
 use toubeelib\core\services\praticien\ServicePraticien;
 use toubeelib\core\services\praticien\ServicePraticienInterface;
-use toubeelib\core\services\rdv\ServiceRdv;
-use toubeelib\core\services\rdv\ServiceRdvInterface;
-use toubeelib\core\services\patient\ServicePatient; 
-use toubeelib\core\services\patient\ServicePatientInterface; 
-use toubeelib\core\repositoryInterfaces\PraticienRepositoryInterface;
-use toubeelib\core\repositoryInterfaces\RdvRepositoryInterface;
-use toubeelib\core\repositoryInterfaces\PatientRepositoryInterface;
-use toubeelib\infrastructure\repositories\ArrayPraticienRepository;
-use toubeelib\infrastructure\repositories\ArrayRdvRepository;
-use toubeelib\infrastructure\repositories\PatientRepository;
 use toubeelib\application\actions\CreatePraticienAction;
 use toubeelib\application\actions\GetPraticienAction;
 use toubeelib\application\actions\GetPraticienByIdAction;
-use toubeelib\application\actions\GetRdvAction;
-use toubeelib\application\actions\CreateRdvAction;
-use toubeelib\application\actions\GetPlanningByPraticienAction;
-use toubeelib\application\actions\SignInAction;
-use toubeelib\infrastructure\db\PDOAuthRepository;
-use toubeelib\infrastructure\db\PDOPraticienRepository;
-use toubeelib\infrastructure\db\PDORdvRepository;
-use toubeelib\infrastructure\db\PDOPatientRepository;
-use toubeelib\core\services\auth\ServiceAuthentification;
-use toubeelib\core\services\auth\ServiceAuthentificationInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationRdv;
-use toubeelib\core\services\auth\ServiceAuthorizationRdvInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationPatient;
-use toubeelib\core\services\auth\ServiceAuthorizationPatientInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationPraticien;
-use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
-use toubeelib\application\Provider\JWTAuthProvider; 
+use toubeelib\application\Provider\JWTAuthProvider;
 use toubeelib\application\Provider\JWTManager;
 
 return [

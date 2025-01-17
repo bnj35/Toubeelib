@@ -17,9 +17,6 @@ return function( \Slim\App $app):\Slim\App {
     $app->get('/praticiens', \toubeelib\application\actions\GetPraticienAction::class)
     ->setName('praticiens');
 
-    $app->post('/praticiens', \toubeelib\application\actions\CreatePraticienAction::class)
-    ->setName('create_praticien');
-
     //micro-service rdv
     
     $app->get('patients/{id}', \toubeelib\application\actions\GetPatientByIdAction::class)

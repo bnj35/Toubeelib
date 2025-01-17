@@ -145,11 +145,7 @@ return [
     GetPraticienByIdAction::class => function (ContainerInterface $c) {
         return new GetPraticienByIdAction($c->get(ServicePraticienInterface::class));
     },
-
-    CreatePraticienAction::class => function (ContainerInterface $c) {
-        return new CreatePraticienAction($c->get(ServicePraticienInterface::class));
-    },
-
+    
     GetPraticienAction::class => function (ContainerInterface $c) {
         return new GetPraticienAction($c->get(ServicePraticienInterface::class));
     },
