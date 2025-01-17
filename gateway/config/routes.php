@@ -12,13 +12,13 @@ return function(App $app):App {
 
     //micro-service praticien
 
-    $app->get('/praticiens/{id}', \toubeelib\application\actions\GatewayGetPraticienByIdAction::class)
+    $app->get('/praticiens/{id}', \toubeelib\application\actions\GatewayPraticienAction::class)
     ->setName('praticienId');
 
-    $app->get('/praticiens', \toubeelib\application\actions\GatewayGetPraticienAction::class)
+    $app->get('/praticiens', \toubeelib\application\actions\GatewayPraticienAction::class)
     ->setName('praticiens');
 
-    $app->post('/praticiens', \toubeelib\application\actions\CreatePraticienAction::class)
+    $app->post('/praticiens', \toubeelib\application\actions\GatewayPraticienAction::class)
     ->setName('create_praticien');
 
     //micro-service rdv

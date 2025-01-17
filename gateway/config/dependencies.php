@@ -88,11 +88,19 @@ return [
     GatewayGetPraticienByIdAction::class => function(ContainerInterface $c) {
         return new GatewayGetPraticienByIdAction($c->get('praticien.client'));
     },
+
+    GatewayPraticienAction::class => function(ContainerInterface $c) {
+        return new GatewayPraticienAction($c->get('praticien.client'));
+    },
     
     //rdvs
 
     GatewayGetRdvAction::class => function(ContainerInterface $c) {
         return new GatewayGetRdvAction($c->get('rdv.client'));
+    },
+
+    GatewayRdvAction::class => function(ContainerInterface $c) {
+        return new GatewayRdvAction($c->get('rdv.client'));
     },
 
     //auth
