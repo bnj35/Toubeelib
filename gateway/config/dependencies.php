@@ -36,6 +36,7 @@ use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
 use GuzzleHttp\Client;
+use toubeelib\application\actions\GatewayGetPraticienAction;
 
 return [
 
@@ -52,89 +53,19 @@ return [
         return $logger;
     },
 
-    //PDO
-    'auth.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('auth.ini'));
-        $authPdo = new PDO('pgsql:host=' . $data['host'] . ';dbname=' . $data['dbname'], $data['username'], $data['password']);
-        $authPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $authPdo;
-    },
-    'rdv.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('rdv.ini'));
-        $rdvPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $rdvPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $rdvPdo;
-    },
-    'patient.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('patient.ini'));
-        $patientPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $patientPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $patientPdo;
-    },
-    'praticien.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('praticien.ini'));
-        $praticienPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $praticienPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $praticienPdo;
-    },
 
-    //guzzle client 
-
-    Client::class => function (ContainerInterface $c) {
-        return new Client(['base_uri' => 'http://api.toubeelib/']);
+    // Guzzle clients for microservices
+    'praticien.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.praticien.toubeelib/']);
     },
-
-    //Repositories
-    
-    AuthRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOAuthRepository($c->get('auth.pdo'));
+    'rdv.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.rdv.toubeelib/']);
     },
-    RdvRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDORdvRepository($c->get('rdv.pdo'));
+    'user.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.user.toubeelib/']);
     },
-    PatientRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPatientRepository($c->get('patient.pdo'));
-    },
-    
-    PraticienRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPraticienRepository($c->get('praticien.pdo'));
-    },
-    
-    
-    //Services
-
-    ServiceAuthentificationInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthentification(
-            $c->get(AuthRepositoryInterface::class),
-        );
-    },
-    ServiceAuthorizationRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationRdv(
-            $c->get(RdvRepositoryInterface::class)
-        );
-    },
-    ServiceAuthorizationPatientInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPatient();
-    },
-    ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPraticien();
-    },
-    ServiceRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceRdv(
-            $c->get(PraticienRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
-            $c->get(PatientRepositoryInterface::class),
-            $c->get('prog.logger')
-        );
-    },
-    ServicePraticienInterface::class => function (ContainerInterface $c) {
-        return new ServicePraticien($c->get(PraticienRepositoryInterface::class));
-    },
-    ServicePatientInterface::class => function (ContainerInterface $c) {
-        return new ServicePatient(
-            $c->get(PatientRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
-        );
+    'app.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.app.toubeelib/']);
     },
 
     // Providers
@@ -148,36 +79,20 @@ return [
     //Actions
 
     //praticiens
-    GetPraticienByIdAction::class => function (ContainerInterface $c) {
-        return new GetPraticienByIdAction($c->get(ServicePraticienInterface::class));
+
+    GatewayGetPraticienAction::class => function(ContainerInterface $c) {
+        return new GatewayGetPraticienAction($c->get('praticien.client'));
     },
-
-    CreatePraticienAction::class => function (ContainerInterface $c) {
-        return new CreatePraticienAction($c->get(ServicePraticienInterface::class));
-    },
-
-    // GetPraticienAction::class => function (ContainerInterface $c) {
-    //     return new GetPraticienAction($c->get(ServicePraticienInterface::class));
-    // },
-
+    
     //rdvs
-    GetRdvAction::class => function (ContainerInterface $c) {
-        return new GetRdvAction($c->get(ServiceRdvInterface::class));
-    },
 
-    CreateRdvAction::class => function (ContainerInterface $c) {
-        return new CreateRdvAction(
-            $c->get(ServiceRdvInterface::class),
-        );
-    },
-
-    GetPlanningByPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPlanningByPraticienAction($c->get(ServiceRdvInterface::class));
+    GatewayGetRdvAction::class => function(ContainerInterface $c) {
+        return new GatewayGetRdvAction($c->get('rdv.client'));
     },
 
     //auth
 
-    SignInAction::class => function (ContainerInterface $c) {
+    GatewaySignInAction::class => function (ContainerInterface $c) {
         return new SignInAction(
             $c->get(AuthProviderInterface::class),
             $c->get(ServiceAuthentificationInterface::class)
@@ -185,9 +100,9 @@ return [
         );
     },
 
-    //gateway
-
-    GatewayGetPraticienAction::class => function(ContainerInterface $c) {
-        return new GatewayGetPraticienAction($c->get(PraticienRepository::class));
+    GatewayGetUserAction::class => function(ContainerInterface $c) {
+        return new GatewayUserAction($c->get('user.client'));
     },
+
+
 ];

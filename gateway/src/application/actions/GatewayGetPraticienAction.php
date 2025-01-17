@@ -1,29 +1,25 @@
 <?php
-    namespace toubeelib\application\actions;
+namespace toubeelib\application\actions;
 
-    use Psr\Http\Message\ServerRequestInterface as Request;
-    use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
-    use toubeelib\domain\praticien\PraticienRepository;
-    use guzzlehttp\Client;
+use toubeelib\application\renderers\JsonRenderer;
+use toubeelib\application\actions\GatewayAbstractAction;
+use GuzzleHttp\Client;
 
-    class GatewayGetPraticienAction extends GatewayAbstractAction
+class GatewayGetPraticienAction extends GatewayAbstractAction
+{
+    private Client $client;
+
+    public function __construct(Client $client)
     {
-        private PraticienRepository $praticienRepository;
-
-        public function __construct(PraticienRepository $praticienRepository)
-        {
-            $this->praticienRepository = $praticienRepository;
-        }
-
-        public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, Client $client): ResponseInterface
-        {
-            $praticiens = $this->praticienRepository->getPraticiens();
-            $response = [
-                "type" => "collection",
-                "locale" => "fr-FR",
-                "praticiens" => $praticiens
-            ];
-            return JsonRenderer::render($rs, 200, $response);
-        }
+        $this->client = $client;
     }
+
+    public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface
+    {
+        $response = $this->client->get('praticiens');  
+        return $response;
+    }
+}

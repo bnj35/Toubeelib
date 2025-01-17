@@ -109,4 +109,7 @@ services:
       - toubeelib.net
     depends_on:
       - toubeelib.db
+      - api.praticien.toubeelib
+      - api.rdv.toubeelib
+      - api.user.toubeelib
     command: php -S 0.0.0.0:80 -t /var/php/public

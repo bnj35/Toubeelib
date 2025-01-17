@@ -36,6 +36,7 @@ use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
+use GuzzleHttp\Client;
 
 return [
     //log 
@@ -139,6 +140,7 @@ return [
         );
     },
 
+
     //Actions
 
     //praticiens
@@ -177,5 +179,11 @@ return [
             $c->get(ServiceAuthentificationInterface::class)
             
         );
+    },
+
+    //gateway
+
+    GatewayGetPraticienAction::class => function(ContainerInterface $c) {
+        return new GatewayGetPraticienAction($c->get(Client::class));
     },
 ];
