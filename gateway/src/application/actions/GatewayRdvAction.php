@@ -41,21 +41,9 @@ class GatewayRdvAction extends GatewayAbstractAction
             $options['headers'] = ['Authorization' => $auth];
         }
         try {
-                try {
-                    $response = $this->client->request($method, $path, $options);
-                    var_dump($response->getBody()->getContents());
-                    $rs->getBody()->write($response->getBody()->getContents());
-                    return $rs->withStatus($response->getStatusCode());
-                } catch (ClientException $e) {
-                    if ($e->getCode() === 404) {
-                        throw new HttpNotFoundException($rq, "Rdv not found");
-                    }
-                    throw $e;
-                }
             $response = $this->client->request($method, $path, $options);
             $rs->getBody()->write($response->getBody()->getContents());
             return $rs->withStatus($response->getStatusCode());
-
         } catch (ConnectException | ServerException $e) {
             throw new HttpInternalServerErrorException($rq, " internal server error");
         } catch (ClientException $e) {

@@ -9,14 +9,6 @@ return function( \Slim\App $app):\Slim\App {
 
     $app->get('/', \toubeelib\application\actions\HomeAction::class);
 
-    //micro-service praticien
-
-    $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
-    ->setName('praticienId');
-
-    $app->get('/praticiens', \toubeelib\application\actions\GetPraticienAction::class)
-    ->setName('praticiens');
-
     //micro-service rdv
     
     $app->get('patients/{id}', \toubeelib\application\actions\GetPatientByIdAction::class)

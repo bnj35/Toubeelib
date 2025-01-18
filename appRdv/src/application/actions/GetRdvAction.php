@@ -29,6 +29,7 @@ class GetRdvAction extends AbstractAction
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args):ResponseInterface
     {
         try{
+            
             $rdvId = $args['id'];
             $routeContext = RouteContext::fromRequest($rq);
             $routeParser = $routeContext->getRouteParser();
