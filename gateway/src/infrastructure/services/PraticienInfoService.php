@@ -16,7 +16,14 @@ class PraticienInfoService implements PraticienInfoServiceInterface
 
     public function getPraticienById(string $id): array
     {
-        $response = $this->client->get("/praticiens/{$id}");
-        return json_decode($response->getBody()->getContents(), true);
+        try {
+            $response = $this->client->get("/praticiens/{$id}");
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            return [
+                'error' => 'Praticien not found',
+                'message' => $e->getMessage()
+            ];
+        }
     }
 }

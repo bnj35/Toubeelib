@@ -83,7 +83,7 @@ return [
     PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
         return new PraticienInfoService($c->get('praticien.client'));
     },
-
+    
     //Actions
 
     //praticiens
