@@ -36,6 +36,8 @@ use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
 use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
+use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
+use toubeelib\infrastructure\services\PraticienInfoService;
 
 return [
     //log 
@@ -121,8 +123,8 @@ return [
             $c->get('prog.logger')
         );
     },
-    ServicePraticienInterface::class => function (ContainerInterface $c) {
-        return new ServicePraticien($c->get(PraticienRepositoryInterface::class));
+    PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
+        return new PraticienInfoService($c->get(PraticienRepositoryInterface::class));
     },
     ServicePatientInterface::class => function (ContainerInterface $c) {
         return new ServicePatient(
@@ -143,11 +145,11 @@ return [
 
     //praticiens
     GetPraticienByIdAction::class => function (ContainerInterface $c) {
-        return new GetPraticienByIdAction($c->get(ServicePraticienInterface::class));
+        return new GetPraticienByIdAction($c->get(PraticienInfoServiceInterface::class));
     },
     
     GetPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPraticienAction($c->get(ServicePraticienInterface::class));
+        return new GetPraticienAction($c->get(PraticienInfoServiceInterface::class));
     },
 
     //rdvs
