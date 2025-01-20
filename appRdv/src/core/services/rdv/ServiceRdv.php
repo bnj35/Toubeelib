@@ -13,22 +13,21 @@ use toubeelib\core\dto\rdv\RdvDTO;
 //interfaces
 use toubeelib\core\services\rdv\ServiceRdvInterface;
 use toubeelib\core\repositoryInterfaces\PatientRepositoryInterface;
-use toubeelib\core\repositoryInterfaces\PraticienRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\RdvRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\RepositoryEntityNotFoundException;
 use toubeelib\core\repositoryInterfaces\RepositoryInternalServerError;
+use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 
 class ServiceRdv implements ServiceRdvInterface
 {
-    private PraticienRepositoryInterface $praticienRepository;
+    private PraticienInfoServiceInterface $praticienInfoService;
     private RdvRepositoryInterface $rdvRepository;
-
     private PatientRepositoryInterface $patientRepository;
     private LoggerInterface $logger;
 
-    public function __construct(PraticienRepositoryInterface $praticienRepository, RdvRepositoryInterface $rdvRepository, PatientRepositoryInterface $patientRepository,LoggerInterface $logger)
+    public function __construct(PraticienInfoServiceInterface $praticienInfoService, RdvRepositoryInterface $rdvRepository, PatientRepositoryInterface $patientRepository, LoggerInterface $logger)
     {
-        $this->praticienRepository = $praticienRepository;
+        $this->praticienInfoService = $praticienInfoService;
         $this->rdvRepository = $rdvRepository;
         $this->patientRepository = $patientRepository;
         $this->logger = $logger;
@@ -36,12 +35,12 @@ class ServiceRdv implements ServiceRdvInterface
 
     public function createRdv(CreateRdvDTO $createRDVDTO): RdvDTO
     {
-        try{
+        try {
             if ($createRDVDTO->praticienId == null) {
                 throw new RdvPraticienNotFoundException();
             }
-            $praticien = $this->praticienRepository->getPraticienById($createRDVDTO->praticienId);
-            $specialitePraticien = $praticien->getSpecialite();
+            $praticien = $this->praticienInfoService->getPraticienById($createRDVDTO->praticienId);
+            $specialitePraticien = $praticien['specialite'];
 
             if ($createRDVDTO->specialite != $specialitePraticien) {
                 throw new RdvSpecialitePraticienDifferentException($createRDVDTO->specialite . '!=' . $specialitePraticien);
@@ -61,16 +60,16 @@ class ServiceRdv implements ServiceRdvInterface
                 $createRDVDTO->patientId,
                 $specialitePraticien,
                 $createRDVDTO->date,
-                'scheduled' 
+                'scheduled'
             );
 
             $this->rdvRepository->save($Rdv);
             return new RdvDTO($Rdv);
-            
+
         } catch (RepositoryEntityNotFoundException $e) {
             throw new RdvBadDataException($e->getMessage());
         } catch (RepositoryInternalServerError $e) {
-            throw new RdvInternalServerError( $e->getMessage());
+            throw new RdvInternalServerError($e->getMessage());
         }
     }
 
@@ -85,12 +84,11 @@ class ServiceRdv implements ServiceRdvInterface
         } catch (RepositoryInternalServerError $e) {
             throw new RdvInternalServerError($e->getMessage());
         }
-
     }
 
     public function getPlanningByPraticien(PlanningPraticienDTO $disponibilityPraticienRDVDto): array
     {
-        try{
+        try {
             $rdvs = $this->rdvRepository->getRdvByPraticienId($disponibilityPraticienRDVDto->idPraticien);
             $disponibility = [];
             if ($disponibilityPraticienRDVDto->dateDebut > $disponibilityPraticienRDVDto->dateFin) {
@@ -116,7 +114,6 @@ class ServiceRdv implements ServiceRdvInterface
         } catch (RepositoryInternalServerError $e) {
             throw new RdvInternalServerError($e->getMessage());
         }
-
     }
 
     public function getRdvByPraticienId(string $id): array

@@ -38,7 +38,6 @@ use toubeelib\application\Provider\JWTManager;
 use GuzzleHttp\Client;
 use toubeelib\application\actions\GatewayPraticienAction;
 use toubeelib\application\actions\GatewayRdvAction;
-use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 use toubeelib\infrastructure\services\PraticienInfoService;
 
 return [
@@ -78,12 +77,6 @@ return [
             new JWTManager
         );
     },
-
-    // Services
-    PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
-        return new PraticienInfoService($c->get('praticien.client'));
-    },
-    
     //Actions
 
     //praticiens
@@ -97,7 +90,6 @@ return [
     GatewayRdvAction::class => function(ContainerInterface $c) {
         return new GatewayRdvAction(
             $c->get('rdv.client'),
-            $c->get(PraticienInfoServiceInterface::class)
         );
     },
 

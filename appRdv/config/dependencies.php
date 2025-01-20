@@ -54,12 +54,6 @@ return [
         return $logger;
     },
 
-    //Client
-
-    PraticienClient::class => function (ContainerInterface $c) {
-        return new Client(['base_uri' => 'http://api.praticien.toubeelib/',]);
-    },
-
     //PDO
     'auth.pdo' => function (ContainerInterface $c) {
         $data = parse_ini_file($c->get('auth.ini'));
@@ -80,6 +74,11 @@ return [
         return $patientPdo;
     },
 
+    //client
+    'praticien.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.praticien.toubeelib/']);
+    },
+
 
     //Repositories
     
@@ -92,14 +91,11 @@ return [
     PatientRepositoryInterface::class => function (ContainerInterface $c) {
         return new PDOPatientRepository($c->get('patient.pdo'));
     },
-    PraticienRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPraticienRepository($c->get(PraticienClient::class));
-    },
 
     
     //Services
     PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
-        return new PraticienInfoService($c->get(PraticienClient::class));
+        return new PraticienInfoService($c->get('praticien.client'));
     },
 
     ServiceAuthentificationInterface::class => function (ContainerInterface $c) {
@@ -116,11 +112,11 @@ return [
         return new ServiceAuthorizationPatient();
     },
     ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPraticien( $c->get(PraticienClient::class));
+        return new ServiceAuthorizationPraticien( $c->get('praticien.client'));
     },
     ServiceRdvInterface::class => function (ContainerInterface $c) {
         return new ServiceRdv(
-            $c->get(PraticienRepositoryInterface::class),
+            $c->get(PraticienInfoServiceInterface::class),
             $c->get(RdvRepositoryInterface::class),
             $c->get(PatientRepositoryInterface::class),
             $c->get('prog.logger')
@@ -155,7 +151,10 @@ return [
 
     //rdvs
     GetRdvAction::class => function (ContainerInterface $c) {
-        return new GetRdvAction($c->get(ServiceRdvInterface::class));
+        return new GetRdvAction(
+            $c->get(ServiceRdvInterface::class),
+            $c->get(PraticienInfoServiceInterface::class)
+        );
     },
 
     CreateRdvAction::class => function (ContainerInterface $c) {

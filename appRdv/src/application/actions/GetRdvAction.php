@@ -15,15 +15,18 @@ use toubeelib\application\renderer\JsonRenderer;
 use toubeelib\core\services\rdv\RdvInternalServerErrorException;
 use toubeelib\core\services\rdv\RdvNotFoundException;
 use toubeelib\core\services\rdv\ServiceRdvInterface;
+use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 
 
 class GetRdvAction extends AbstractAction
 {
     private ServiceRdvInterface $RdvServiceInterface;
+    private PraticienInfoServiceInterface $praticienInfoService;
 
-    public function __construct(ServiceRdvInterface $RdvService)
+    public function __construct(ServiceRdvInterface $RdvService, PraticienInfoServiceInterface $praticienInfoService)
     {
         $this->RdvServiceInterface = $RdvService;
+        $this->praticienInfoService = $praticienInfoService;
     }
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args):ResponseInterface
@@ -34,6 +37,7 @@ class GetRdvAction extends AbstractAction
             $routeContext = RouteContext::fromRequest($rq);
             $routeParser = $routeContext->getRouteParser();
             $rdv = $this->RdvServiceInterface->getRdvById($rdvId);
+            $praticien = $this->praticienInfoService->getPraticienById($rdv->praticienId);
             $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
             $urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
             $urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);

@@ -23,6 +23,11 @@ return function( \Slim\App $app):\Slim\App {
     $app->get('/praticiens/{praticien_id}/planning', \toubeelib\application\actions\GetPlanningByPraticienAction::class)
     ->setName('praticien_planning');
 
+    //micro-service praticien
+
+    $app->get('/praticiens/{id}', \toubeelib\application\actions\GetPraticienByIdAction::class)
+    ->setName('praticienId');
+
     //micro-service authentification
 
     $app->get('/signin', \toubeelib\application\actions\SignInAction::class)

@@ -14,18 +14,16 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 
+
 use GuzzleHttp\Client;
-use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 
 class GatewayRdvAction extends GatewayAbstractAction
 {
     private Client $client;
-    private PraticienInfoServiceInterface $praticienInfoService;
 
-    public function __construct(Client $client, PraticienInfoServiceInterface $praticienInfoService)
+    public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->praticienInfoService = $praticienInfoService;
     }
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface
@@ -41,9 +39,10 @@ class GatewayRdvAction extends GatewayAbstractAction
             $options['headers'] = ['Authorization' => $auth];
         }
         try {
-            $response = $this->client->request($method, $path, $options);
-            $rs->getBody()->write($response->getBody()->getContents());
-            return $rs->withStatus($response->getStatusCode());
+                    $response = $this->client->request($method, $path, $options);
+                    $rs->getBody()->write($response->getBody()->getContents());
+                    return $rs->withStatus($response->getStatusCode());
+
         } catch (ConnectException | ServerException $e) {
             throw new HttpInternalServerErrorException($rq, " internal server error");
         } catch (ClientException $e) {
