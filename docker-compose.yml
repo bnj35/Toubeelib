@@ -7,7 +7,6 @@ services:
   # service api.toubeelib : api pour la prise de rdv
   #
   api.toubeelib:
-  # gateway: toubeelib:
   #  image: 'canals/php:8.3-cli'
     build:
       context: build
@@ -24,7 +23,58 @@ services:
       - toubeelib.db
     command: php -S 0.0.0.0:80 -t /var/php/public
 
-    # service toubeelib.db : base de données postgresql
+  # service api.praticien.toubeelib : micro-service pour la gestion des praticiens
+  api.praticien.toubeelib:
+    build:
+      context: build
+      dockerfile: 8.3-cli.Dockerfile
+    env_file: ./toubeelib.env
+    ports:
+      - '6081:80'
+    volumes:
+      - ./appPraticien:/var/php
+    working_dir: /var/php
+    networks:
+      - toubeelib.net
+    depends_on:
+      - toubeelib.db
+    command: php -S 0.0.0.0:80 -t /var/php/public
+
+  # service api.rdv.toubeelib : micro-service pour la gestion des rdv
+  api.rdv.toubeelib:
+    build:
+      context: build
+      dockerfile: 8.3-cli.Dockerfile
+    env_file: ./toubeelib.env
+    ports:
+      - '6082:80'
+    volumes:
+      - ./appRdv:/var/php
+    working_dir: /var/php
+    networks:
+      - toubeelib.net
+    depends_on:
+      - toubeelib.db
+    command: php -S 0.0.0.0:80 -t /var/php/public
+
+  # service api.user.toubeelib : micro-service pour la gestion des utilisateurs
+  api.user.toubeelib:
+    build:
+      context: build
+      dockerfile: 8.3-cli.Dockerfile
+    env_file: ./toubeelib.env
+    ports:
+      - '6083:80'
+    volumes:
+      - ./appUser:/var/php
+    working_dir: /var/php
+    networks:
+      - toubeelib.net
+    depends_on:
+      - toubeelib.db
+    command: php -S 0.0.0.0:80 -t /var/php/public
+
+  # service toubeelib.db : base de données postgresql
   toubeelib.db:
     image: 'postgres:latest'
     env_file: ./toubeelibdb.env
@@ -34,12 +84,31 @@ services:
       - toubeelib.net
     volumes:
       - ./app/sql:/var/sql'
-  #
+
   # service administration des bases sql
-  #
   adminer:
     image: adminer
     ports:
       - '8080:8080'
     networks:
       - toubeelib.net
+
+  # service guzzle : separation des services
+  gateway.toubeelib:
+    build:
+      context: build
+      dockerfile: 8.3-cli.Dockerfile
+    env_file: ./toubeelib.env
+    ports:
+      - '6086:80'
+    volumes:
+      - ./gateway:/var/php
+    working_dir: /var/php
+    networks:
+      - toubeelib.net
+    depends_on:
+      - toubeelib.db
+      - api.praticien.toubeelib
+      - api.rdv.toubeelib
+      - api.user.toubeelib
+    command: php -S 0.0.0.0:80 -t /var/php/public
