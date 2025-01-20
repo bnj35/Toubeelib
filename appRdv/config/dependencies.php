@@ -37,7 +37,8 @@ use toubeelib\core\services\auth\AuthProviderInterface;
 use toubeelib\application\Provider\JWTAuthProvider; 
 use toubeelib\application\Provider\JWTManager;
 use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
-use toubeelib\infrastructure\services\PraticienInfoService;
+use toubeelib\core\services\praticien\PraticienInfoService;
+use GuzzleHttp\Client;
 
 return [
     //log 
@@ -51,6 +52,12 @@ return [
                 $c->get('log.prog.file'),
                 $c->get('log.prog.level')));
         return $logger;
+    },
+
+    //Client
+
+    PraticienClient::class => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.praticien.toubeelib/',]);
     },
 
     //PDO
@@ -72,12 +79,6 @@ return [
         $patientPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $patientPdo;
     },
-    'praticien.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('praticien.ini'));
-        $praticienPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $praticienPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $praticienPdo;
-    },
 
 
     //Repositories
@@ -91,13 +92,15 @@ return [
     PatientRepositoryInterface::class => function (ContainerInterface $c) {
         return new PDOPatientRepository($c->get('patient.pdo'));
     },
-    
     PraticienRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPraticienRepository($c->get('praticien.pdo'));
+        return new PDOPraticienRepository($c->get(PraticienClient::class));
     },
-    
+
     
     //Services
+    PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
+        return new PraticienInfoService($c->get(PraticienClient::class));
+    },
 
     ServiceAuthentificationInterface::class => function (ContainerInterface $c) {
         return new ServiceAuthentification(
@@ -113,7 +116,7 @@ return [
         return new ServiceAuthorizationPatient();
     },
     ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPraticien();
+        return new ServiceAuthorizationPraticien( $c->get(PraticienClient::class));
     },
     ServiceRdvInterface::class => function (ContainerInterface $c) {
         return new ServiceRdv(
@@ -123,9 +126,7 @@ return [
             $c->get('prog.logger')
         );
     },
-    PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
-        return new PraticienInfoService($c->get(PraticienRepositoryInterface::class));
-    },
+
     ServicePatientInterface::class => function (ContainerInterface $c) {
         return new ServicePatient(
             $c->get(PatientRepositoryInterface::class),

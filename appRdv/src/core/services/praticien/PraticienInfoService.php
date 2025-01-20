@@ -1,6 +1,6 @@
 <?php
 
-namespace toubeelib\infrastructure\services;
+namespace toubeelib\core\services\praticien;
 
 use GuzzleHttp\Client;
 use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
