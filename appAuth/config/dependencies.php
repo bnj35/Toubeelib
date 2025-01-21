@@ -98,9 +98,10 @@ return [
         );
     },
 
-    RegisterAction::class => function(Container $c) {
+    RegisterAction::class => function(ContainerInterface $c) {
         return new RegisterAction(
             $c->get(AuthProviderInterface::class),
+            $c->get(ServiceAuthentificationInterface::class)
         );
     },
 ];

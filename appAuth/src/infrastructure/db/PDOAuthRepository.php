@@ -34,20 +34,22 @@ class PDOAuthRepository implements AuthRepositoryInterface
                 'password' => $user->getPassword(),
                 'role' => $user->getRole()
             ]);
+            $rs = 'Id: '.$user->getID().' Email: '.$user->getEmail().' Password: '.$user->getPassword().' Role: '.$user->getRole();
+            return $rs;
 
         }catch (\PDOException $e){
             throw new RepositoryInternalServerError("Error while saving user");
         }
     }
 
-    public function getUserByEmail(string $email): User
+    public function getUserByEmail(string $email): ? User 
     {
         try{
             $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch();
             if ($user === false) {
-                throw new RepositoryEntityNotFoundException("User not found");
+                return null;
             }
             $u =  new User($user['email'], $user['password'], $user['role']);
             $u->setID($user['id']);
