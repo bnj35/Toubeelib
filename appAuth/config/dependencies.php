@@ -33,9 +33,9 @@ use toubeelib\core\services\auth\ServiceAuthorizationPatient;
 use toubeelib\core\services\auth\ServiceAuthorizationPatientInterface;
 use toubeelib\core\services\auth\ServiceAuthorizationPraticien;
 use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
-use toubeelib\core\services\auth\AuthProviderInterface;
-use toubeelib\application\Provider\JWTAuthProvider; 
-use toubeelib\application\Provider\JWTManager;
+use toubeelib\application\provider\AuthProviderInterface;
+use toubeelib\application\provider\JWTAuthProvider; 
+use toubeelib\application\provider\JWTManager;
 
 return [
     //log 
@@ -84,13 +84,10 @@ return [
 
     //Actions
 
-    //auth
-
     SignInAction::class => function (ContainerInterface $c) {
         return new SignInAction(
             $c->get(AuthProviderInterface::class),
             $c->get(ServiceAuthentificationInterface::class)
-            
         );
     },
 
@@ -104,7 +101,6 @@ return [
     RegisterAction::class => function(Container $c) {
         return new RegisterAction(
             $c->get(AuthProviderInterface::class),
-            $c->get(ServiceAuthentificationInterface::class)
         );
     },
 ];

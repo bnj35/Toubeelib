@@ -7,7 +7,6 @@ use toubeelib\core\domain\entities\user\User;
 //dto
 use toubeelib\core\dto\auth\AuthDTO;
 use toubeelib\core\dto\auth\CredentialsDTO;
-use toubeelib\core\dto\auth\TokenDTO;
 //interfaces
 use toubeelib\core\repositoryInterfaces\AuthRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\RepositoryEntityNotFoundException;

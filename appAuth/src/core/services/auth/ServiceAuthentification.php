@@ -7,7 +7,6 @@ use toubeelib\core\domain\entities\user\User;
 //dto
 use toubeelib\core\dto\auth\AuthDTO;
 use toubeelib\core\dto\auth\CredentialsDTO;
-use toubeelib\core\dto\auth\TokenDTO;
 //interfaces
 use toubeelib\core\repositoryInterfaces\AuthRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\RepositoryEntityNotFoundException;
@@ -59,10 +58,10 @@ class ServiceAuthentification implements ServiceAuthentificationInterface
         }
     }
 
-    public function byToken(string $token): AuthDTO
+    public function refresh(string $token): AuthDTO
     {
         try{
-            $tokenDTO = new TokenDTO($token);
+            $tokenDTO = new AuthDTO($token);
             $user = $this->authRepository->getUserByID($tokenDTO->userID);
             if ($user === null) {
                 throw new AuthentificationServiceNotFoundException("User not found");
@@ -74,6 +73,5 @@ class ServiceAuthentification implements ServiceAuthentificationInterface
             throw new AuthentificationServiceInternalServerErrorException("Error while fetching user");
         }
     }
-    
 
 }

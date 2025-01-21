@@ -11,13 +11,13 @@ return function( \Slim\App $app):\Slim\App {
 
     //micro-service authentification
 
-    $app->get('/signin', \toubeelib\application\actions\SignInAction::class)
+    $app->post('/signin', \toubeelib\application\actions\SignInAction::class)
     ->setName('signin');
 
-    $app->get('refresh', \toubeelib\application\actions\RefreshTokenAction::class)
+    $app->get('/refresh', \toubeelib\application\actions\RefreshTokenAction::class)
     ->setName('refresh');
 
-    $app->get('register', \toubeelib\application\actions\RegisterAction::class)
+    $app->post('/register', \toubeelib\application\actions\RegisterAction::class)
     ->setName('register');
     
 

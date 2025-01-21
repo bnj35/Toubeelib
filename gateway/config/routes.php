@@ -37,8 +37,15 @@ return function(App $app):App {
 
     //micro-service authentification
 
-    $app->get('/signin', \toubeelib\application\actions\SignInAction::class)
+    $app->post('/signin', \toubeelib\application\actions\GatewayAuthAction::class)
     ->setName('signin');
+
+    $app->get('/refresh', \toubeelib\application\actions\GatewayAuthAction::class)
+    ->setName('refresh');
+
+    $app->post('/register', \toubeelib\application\actions\GatewayAuthAction::class)
+    ->setName('register');
+
     
 
     return $app;

@@ -38,6 +38,7 @@ use toubeelib\application\Provider\JWTManager;
 use GuzzleHttp\Client;
 use toubeelib\application\actions\GatewayPraticienAction;
 use toubeelib\application\actions\GatewayRdvAction;
+use toubeelib\application\actions\GatewayAuthAction;
 use toubeelib\infrastructure\services\PraticienInfoService;
 
 return [
@@ -63,8 +64,8 @@ return [
     'rdv.client' => function (ContainerInterface $c) {
         return new Client(['base_uri' => 'http://api.rdv.toubeelib/']);
     },
-    'user.client' => function (ContainerInterface $c) {
-        return new Client(['base_uri' => 'http://api.user.toubeelib/']);
+    'auth.client' => function (ContainerInterface $c) {
+        return new Client(['base_uri' => 'http://api.auth.toubeelib/']);
     },
     'app.client' => function (ContainerInterface $c) {
         return new Client(['base_uri' => 'http://api.app.toubeelib/']);
@@ -95,16 +96,8 @@ return [
 
     //auth
 
-    GatewaySignInAction::class => function (ContainerInterface $c) {
-        return new SignInAction(
-            $c->get(AuthProviderInterface::class),
-            $c->get(ServiceAuthentificationInterface::class)
-            
-        );
-    },
-
-    GatewayGetUserAction::class => function(ContainerInterface $c) {
-        return new GatewayUserAction($c->get('user.client'));
+    GatewayAuthAction::class => function(ContainerInterface $c) {
+        return new GatewayAuthAction($c->get('auth.client'));
     },
 
 
