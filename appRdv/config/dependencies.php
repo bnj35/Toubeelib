@@ -138,17 +138,6 @@ return [
         );
     },
 
-    //Actions
-
-    //praticiens
-    GetPraticienByIdAction::class => function (ContainerInterface $c) {
-        return new GetPraticienByIdAction($c->get(PraticienInfoServiceInterface::class));
-    },
-    
-    GetPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPraticienAction($c->get(PraticienInfoServiceInterface::class));
-    },
-
     //rdvs
     GetRdvAction::class => function (ContainerInterface $c) {
         return new GetRdvAction(
@@ -165,15 +154,5 @@ return [
 
     GetPlanningByPraticienAction::class => function (ContainerInterface $c) {
         return new GetPlanningByPraticienAction($c->get(ServiceRdvInterface::class));
-    },
-
-    //auth
-
-    SignInAction::class => function (ContainerInterface $c) {
-        return new SignInAction(
-            $c->get(AuthProviderInterface::class),
-            $c->get(ServiceAuthentificationInterface::class)
-            
-        );
     },
 ];

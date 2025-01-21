@@ -8,9 +8,6 @@ use toubeelib\core\services\praticien\ServicePraticienInterface;
 use toubeelib\application\actions\CreatePraticienAction;
 use toubeelib\application\actions\GetPraticienAction;
 use toubeelib\application\actions\GetPraticienByIdAction;
-use toubeelib\core\services\auth\AuthProviderInterface;
-use toubeelib\application\Provider\JWTAuthProvider;
-use toubeelib\application\Provider\JWTManager;
 
 return [
     //log 
@@ -27,12 +24,6 @@ return [
     },
 
     //PDO
-    'auth.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('auth.ini'));
-        $authPdo = new PDO('pgsql:host=' . $data['host'] . ';dbname=' . $data['dbname'], $data['username'], $data['password']);
-        $authPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $authPdo;
-    },
 
     'praticien.pdo' => function (ContainerInterface $c) {
         $data = parse_ini_file($c->get('praticien.ini'));
@@ -51,18 +42,8 @@ return [
     
     //Services
 
-    // ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-    //     return new ServiceAuthorizationPraticien();
-    // },
     ServicePraticienInterface::class => function (ContainerInterface $c) {
         return new ServicePraticien($c->get(PraticienRepositoryInterface::class));
-    },
-    // Providers
-    AuthProviderInterface::class => function (ContainerInterface $c) {
-        return new JWTAuthProvider(
-            $c->get(ServiceAuthentificationInterface::class),
-            new JWTManager
-        );
     },
 
     //Actions

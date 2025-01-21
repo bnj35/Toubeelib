@@ -31,8 +31,8 @@ class RefreshTokenAction extends AbstractAction
             $token = str_replace('Bearer ', '', $token);
             $authDTO = $this->authProviderInterface->refresh($token);
             $res = [
-                'Token:   '.$authDTO->token,
-                'Refresh token:   '.$authDTO->token_refresh
+                'Token:'=>$authDTO->token,
+                'Refresh token:'=>$authDTO->token_refresh
             ];
             return JsonRenderer::render($rs, 201, $res);
         } catch (AuthentificationServiceInternalServerErrorException $e) {
