@@ -12,5 +12,6 @@ interface ServiceAuthentificationInterface
 {
     public function register(CredentialsDTO $credentials, int $role): string;
     public function byCredentials(CredentialsDTO $credentials): AuthDTO;
+    public function byToken(string $token): AuthDTO;
 
 }

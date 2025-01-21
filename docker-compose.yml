@@ -58,7 +58,7 @@ services:
     command: php -S 0.0.0.0:80 -t /var/php/public
 
   # service api.user.toubeelib : micro-service pour la gestion des utilisateurs
-  api.user.toubeelib:
+  api.auth.toubeelib:
     build:
       context: build
       dockerfile: 8.3-cli.Dockerfile
@@ -66,7 +66,7 @@ services:
     ports:
       - '6083:80'
     volumes:
-      - ./appUser:/var/php
+      - ./appAuth:/var/php
     working_dir: /var/php
     networks:
       - toubeelib.net
@@ -110,5 +110,5 @@ services:
       - toubeelib.db
       - api.praticien.toubeelib
       - api.rdv.toubeelib
-      - api.user.toubeelib
+      - api.auth.toubeelib
     command: php -S 0.0.0.0:80 -t /var/php/public

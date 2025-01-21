@@ -59,4 +59,21 @@ class ServiceAuthentification implements ServiceAuthentificationInterface
         }
     }
 
+    public function byToken(string $token): AuthDTO
+    {
+        try{
+            $tokenDTO = new TokenDTO($token);
+            $user = $this->authRepository->getUserByID($tokenDTO->userID);
+            if ($user === null) {
+                throw new AuthentificationServiceNotFoundException("User not found");
+            }
+            return new AuthDTO($user->getID(), $user->getEmail(), $user->getRole());
+        }catch (RepositoryEntityNotFoundException $e){
+            throw new AuthentificationServiceNotFoundException("User not found");
+        }catch (RepositoryInternalServerError $e){
+            throw new AuthentificationServiceInternalServerErrorException("Error while fetching user");
+        }
+    }
+    
+
 }
