@@ -46,6 +46,9 @@ return function(App $app):App {
     $app->post('/register', \toubeelib\application\actions\GatewayAuthAction::class)
     ->setName('register');
 
+    $app->get('/validate', \toubeelib\application\actions\GatewayAuthAction::class)
+    ->setName('validate');
+
     
 
     return $app;

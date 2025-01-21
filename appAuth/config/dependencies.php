@@ -11,6 +11,7 @@ use toubeelib\application\provider\JWTManager;
 use toubeelib\application\actions\SignInAction;
 use toubeelib\application\actions\RefreshTokenAction;
 use toubeelib\application\actions\RegisterAction;
+use toubeelib\application\actions\ValidateTokenAction;
 
 return [
     //log 
@@ -75,4 +76,11 @@ return [
             $c->get(ServiceAuthentificationInterface::class)
         );
     },
+
+    ValidateTokenAction::class => function(ContainerInterface $c) {
+        return new ValidateTokenAction(
+            $c->get(AuthProviderInterface::class),
+            $c->get(ServiceAuthentificationInterface::class)
+        );
+    }
 ];

@@ -39,8 +39,6 @@ class GatewayAuthAction extends GatewayAbstractAction
         }
         try {
             $response = $this->client->request($method, $path, $options);
-            $rs->getBody()->write($response->getBody()->getContents());
-            return $rs->withStatus($response->getStatusCode());
         } catch (ConnectException | ServerException $e) {
             throw new HttpInternalServerErrorException($rq, " internal server error");
         } catch (ClientException $e) {
