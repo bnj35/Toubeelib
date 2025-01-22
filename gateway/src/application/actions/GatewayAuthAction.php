@@ -9,6 +9,7 @@ use Slim\Exception\HttpInternalServerErrorException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
 use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpBadRequestException;
 
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -39,10 +40,13 @@ class GatewayAuthAction extends GatewayAbstractAction
         }
         try {
             $response = $this->client->request($method, $path, $options);
+            $rs->getBody()->write($response->getBody()->getContents());
+            return $rs->withStatus($response->getStatusCode());
         } catch (ConnectException | ServerException $e) {
             throw new HttpInternalServerErrorException($rq, " internal server error");
         } catch (ClientException $e) {
             match($e->getCode()) {
+                400 => throw new HttpBadRequestException($rq, " Bad request "),
                 401 => throw new HttpUnauthorizedException($rq, " Unauthorized "),
                 403 => throw new HttpForbiddenException($rq, " Forbidden "),
                 404 => throw new HttpNotFoundException($rq, " Not found "),

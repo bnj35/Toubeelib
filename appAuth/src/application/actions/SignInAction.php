@@ -27,6 +27,7 @@ class SignInAction extends AbstractAction {
     }
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface{
+
         $token = $rq->getHeader('Authorization')[0] ?? throw new HttpUnauthorizedException($rq, 'missing Authorization Header');
 
         if ($token === null) {

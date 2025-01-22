@@ -13,7 +13,7 @@ class ValidateTokenAction
 {
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs): ResponseInterface
     {
-        $authHeader = $rq->getHeader('Authorization');
+                $authHeader = $rq->getHeader('Authorization');
         if (empty($authHeader)) {
             return $rs->withStatus(401)->write('Authorization header is missing');
         }

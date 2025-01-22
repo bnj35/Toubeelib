@@ -57,7 +57,7 @@ services:
       - toubeelib.db
     command: php -S 0.0.0.0:80 -t /var/php/public
 
-  # service api.user.toubeelib : micro-service pour la gestion des utilisateurs
+  # service api.auth.toubeelib : micro-service pour la gestion des utilisateurs
   api.auth.toubeelib:
     build:
       context: build
@@ -83,7 +83,7 @@ services:
     networks:
       - toubeelib.net
     volumes:
-      - ./app/sql:/var/sql'
+      - ./app/sql:/var/sql
 
   # service administration des bases sql
   adminer:

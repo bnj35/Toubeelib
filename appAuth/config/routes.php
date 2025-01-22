@@ -20,7 +20,7 @@ return function( \Slim\App $app):\Slim\App {
     $app->post('/register', \toubeelib\application\actions\RegisterAction::class)
     ->setName('register');
     
-    $app->get('/validate', \toubeelib\application\actions\GatewayAuthAction::class)
+    $app->get('/validate', \toubeelib\application\actions\ValidateTokenAction::class)
     ->setName('validate');
 
     return $app;
