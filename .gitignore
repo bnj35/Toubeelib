@@ -29,3 +29,5 @@ auth.ini
 patient.ini
 praticien.ini
 rdv.ini
+
+/rabbitmq_dir/
