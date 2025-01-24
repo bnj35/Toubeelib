@@ -41,10 +41,16 @@ class GetRdvAction extends AbstractAction
             $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
             $urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
             $urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
+            $rdvArray = [
+                "id" => $rdv->id,
+                "date" => $rdv->date->format('Y-m-d H:i:s'),
+                "duree" => $rdv->duree,
+                "statut" => $rdv->statut
+            ];
             $response = [
                 "type" => "resource",
                 "locale" => "fr-FR",
-                "rdv" => $rdv,
+                "rdv" => $rdvArray,
                 "links" => [
                     "self" => ['href' => $urlRDV],
                     "praticien" => ['href' => $urlPraticien],

@@ -20,6 +20,9 @@ use toubeelib\core\services\rdv\RdvInternalServerError;
 use toubeelib\core\services\rdv\RdvNotFoundException;
 use toubeelib\core\services\rdv\RdvPraticienNotFoundException;
 use toubeelib\core\services\rdv\ServiceRdvInterface;
+//AMQP
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class CreateRdvAction extends AbstractAction{
 
@@ -66,16 +69,44 @@ class CreateRdvAction extends AbstractAction{
             $urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
             $urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
 
+            $rdvArray = [
+                "id" => $rdv->id,
+                "date" => $rdv->date->format('Y-m-d H:i:s'),
+                "duree" => $rdv->duree,
+                "statut" => $rdv->statut
+            ];
+
             $response = [
                 "type" => "resource",
                 "locale" => "fr-FR",
-                "rdv" => $rdv,
+                "rdv" => $rdvArray,
                 "links" => [
                     "self" => ['href' => $urlRDV],
                     "praticien" => ['href' => $urlPraticien],
                     "patient" => ['href' => $urlPatient]
                 ]
             ];
+
+            //message queue
+
+            $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
+$channel = $connection->channel();
+$channel->queue_declare('notification_queue', false, false, false, false);
+
+$messageData = [
+    'event' => 'CREATE',
+    'recipient' => [
+        'praticienId' => $rdv->praticienId,
+        'patientId' => $rdv->patientId
+    ],
+    'details' => $rdv
+];
+
+$msg = new AMQPMessage(json_encode($messageData));
+$channel->basic_publish($msg, '', 'notification_queue');
+
+$channel->close();
+$connection->close();
 
             return JsonRenderer::render($rs, 201, $response);
         }
