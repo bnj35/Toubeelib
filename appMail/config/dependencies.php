@@ -1,43 +1,23 @@
 <?php
 
 use Psr\Container\ContainerInterface;
-use toubeelib\core\repositories\AuthRepositoryInterface;
-use toubeelib\core\services\praticien\ServicePraticien;
-use toubeelib\core\services\praticien\ServicePraticienInterface;
-use toubeelib\core\services\rdv\ServiceRdv;
-use toubeelib\core\services\rdv\ServiceRdvInterface;
-use toubeelib\core\services\patient\ServicePatient; 
-use toubeelib\core\services\patient\ServicePatientInterface; 
-use toubeelib\core\repositoryInterfaces\PraticienRepositoryInterface;
-use toubeelib\core\repositoryInterfaces\RdvRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\PatientRepositoryInterface;
-use toubeelib\infrastructure\repositories\ArrayPraticienRepository;
-use toubeelib\infrastructure\repositories\ArrayRdvRepository;
-use toubeelib\infrastructure\repositories\PatientRepository;
-use toubeelib\application\actions\CreatePraticienAction;
-use toubeelib\application\actions\GetPraticienAction;
-use toubeelib\application\actions\GetPraticienByIdAction;
+use toubeelib\infrastructure\db\PDOPatientRepository;
 use toubeelib\application\actions\GetRdvAction;
 use toubeelib\application\actions\CreateRdvAction;
 use toubeelib\application\actions\GetPlanningByPraticienAction;
-use toubeelib\application\actions\SignInAction;
-use toubeelib\infrastructure\db\PDOAuthRepository;
-use toubeelib\infrastructure\db\PDOPraticienRepository;
-use toubeelib\infrastructure\db\PDORdvRepository;
-use toubeelib\infrastructure\db\PDOPatientRepository;
-use toubeelib\core\services\auth\ServiceAuthentification;
-use toubeelib\core\services\auth\ServiceAuthentificationInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationRdv;
-use toubeelib\core\services\auth\ServiceAuthorizationRdvInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationPatient;
 use toubeelib\core\services\auth\ServiceAuthorizationPatientInterface;
-use toubeelib\core\services\auth\ServiceAuthorizationPraticien;
-use toubeelib\core\services\auth\ServiceAuthorizationPraticienInterface;
-use toubeelib\core\services\auth\AuthProviderInterface;
-use toubeelib\application\Provider\JWTAuthProvider; 
-use toubeelib\application\Provider\JWTManager;
+use toubeelib\core\services\auth\ServiceAuthorizationPatient;
 use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 use toubeelib\core\services\praticien\PraticienInfoService;
+use toubeelib\core\services\patient\PatientInfoServiceInterface;
+use toubeelib\core\services\patient\PatientInfoService;
+use toubeelib\core\service\mail\MailServiceInterface;
+use toubeelib\core\service\mail\MailService;
+use toubeelib\core\services\auth\AuthProviderInterface;
+use toubeelib\application\Provider\JWTAuthProvider;
+use toubeelib\application\Provider\JWTManager;
+use toubeelib\application\class\ClassMail;
 use GuzzleHttp\Client;
 
 return [
@@ -54,19 +34,7 @@ return [
         return $logger;
     },
 
-    //PDO
-    'auth.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('auth.ini'));
-        $authPdo = new PDO('pgsql:host=' . $data['host'] . ';dbname=' . $data['dbname'], $data['username'], $data['password']);
-        $authPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $authPdo;
-    },
-    'rdv.pdo' => function (ContainerInterface $c) {
-        $data = parse_ini_file($c->get('rdv.ini'));
-        $rdvPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
-        $rdvPdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $rdvPdo;
-    },
+
     'patient.pdo' => function (ContainerInterface $c) {
         $data = parse_ini_file($c->get('patient.ini'));
         $patientPdo = new PDO('pgsql:host='.$data['host'].';dbname='.$data['dbname'], $data['username'], $data['password']);
@@ -81,13 +49,6 @@ return [
 
 
     //Repositories
-    
-    AuthRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOAuthRepository($c->get('auth.pdo'));
-    },
-    RdvRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDORdvRepository($c->get('rdv.pdo'));
-    },
     PatientRepositoryInterface::class => function (ContainerInterface $c) {
         return new PDOPatientRepository($c->get('patient.pdo'));
     },
@@ -98,35 +59,18 @@ return [
         return new PraticienInfoService($c->get('praticien.client'));
     },
 
-    ServiceAuthentificationInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthentification(
-            $c->get(AuthRepositoryInterface::class),
-        );
+    PatientInfoServiceInterface::class => function (ContainerInterface $c) {
+        return new PatientInfoService($c->get('patient.pdo'));
     },
-    ServiceAuthorizationRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationRdv(
-            $c->get(RdvRepositoryInterface::class)
-        );
-    },
+
     ServiceAuthorizationPatientInterface::class => function (ContainerInterface $c) {
         return new ServiceAuthorizationPatient();
     },
-    ServiceAuthorizationPraticienInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPraticien( $c->get('praticien.client'));
-    },
-    ServiceRdvInterface::class => function (ContainerInterface $c) {
-        return new ServiceRdv(
-            $c->get(PraticienInfoServiceInterface::class),
-            $c->get(RdvRepositoryInterface::class),
-            $c->get(PatientRepositoryInterface::class),
-            $c->get('prog.logger')
-        );
-    },
 
-    ServicePatientInterface::class => function (ContainerInterface $c) {
-        return new ServicePatient(
-            $c->get(PatientRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
+    MailServiceInterface::class => function (ContainerInterface $c) {
+        return new MailService(
+            $c->get(PraticienInfoServiceInterface::class),
+            $c->get(PatientInfoServiceInterface::class)
         );
     },
 
@@ -154,5 +98,13 @@ return [
 
     GetPlanningByPraticienAction::class => function (ContainerInterface $c) {
         return new GetPlanningByPraticienAction($c->get(ServiceRdvInterface::class));
+    },
+
+    ClassMail::class => function (ContainerInterface $c) {
+        return new ClassMail(
+            $c->get(PraticienInfoServiceInterface::class),
+            $c->get(PatientInfoServiceInterface::class),
+            $c->get(MailServiceInterface::class)
+        );
     },
 ];

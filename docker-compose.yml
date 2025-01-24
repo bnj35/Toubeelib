@@ -134,6 +134,15 @@ services:
       timeout: 30s
       retries: 3
 
+  # service mailcatcher : pour tester l'envoi de mails
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - '1080:1080'
+      - '1025:1025'
+    networks:
+      - toubeelib.net
+
   # service api.mail.toubeelib : micro-service pour la gestion des mails
   api.mail.toubeelib:
     build:
@@ -150,4 +159,5 @@ services:
     depends_on:
       - toubeelib.db
       - rabbitmq
+      - mailcatcher
     command: php -S 0.0.0.0:80 -t /var/php/public
