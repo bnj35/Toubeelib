@@ -33,37 +33,42 @@ class ClassMail {
     }
 
     public function __invoke() {
-        $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
-        $channel = $connection->channel();
+        try {
+            $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
+            $channel = $connection->channel();
 
-        $channel->queue_declare('notification_queue', false, false, false, false);
+            $channel->queue_declare('notification_queue', false, true, false, false);
 
-        echo " [*] Waiting for messages. To exit press CTRL+C\n";
+            echo " [*] Waiting for messages. To exit press CTRL+C\n";
 
-        $callback = function($msg) {
-            $data = json_decode($msg->body, true);
-            echo " [x] Decoded details =>", " Praticien Id : ",$data['recipient']['praticienId']," Patient ID : ", $data['recipient']['patientId'], "\n";
-            $praticien = $this->praticienInfoService->getPraticienById($data['recipient']['praticienId']);
-            $patient = $this->patientInfoService->getPatientById($data['recipient']['patientId']);
+            $callback = function($msg) {
+                $data = json_decode($msg->body, true);
+                echo " [x] Decoded details =>", " Praticien Id : ",$data['recipient']['praticienId']," Patient ID : ", $data['recipient']['patientId'], "\n";
+                $praticien = $this->praticienInfoService->getPraticienById($data['recipient']['praticienId']);
+                $patient = $this->patientInfoService->getPatientById($data['recipient']['patientId']);
 
-            $praticienMail = $praticien['email'];
-            $patientMail = $patient['email'];
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $this->mailService->sendEmail($praticienMail, $data['event'], $data['details']);
-                $this->mailService->sendEmail($patientMail, $data['event'], $data['details']);
-            } else {
-                echo "Error decoding JSON message\n";
+                $praticienMail = $praticien['email'];
+                $patientMail = $patient['email'];
+                
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->mailService->sendEmail($praticienMail, $data['event'], $data['details']);
+                    $this->mailService->sendEmail($patientMail, $data['event'], $data['details']);
+                } else {
+                    echo "Error decoding JSON message\n";
+                }
+            };
+
+            $channel->basic_consume('notification_queue', '', false, true, false, false, $callback);
+
+            while($channel->is_consuming()) {
+                $channel->wait();
             }
-        };
 
-        $channel->basic_consume('notification_queue', '', false, true, false, false, $callback);
-
-        while($channel->is_consuming()) {
-            $channel->wait();
+            $channel->close();
+            $connection->close();
+        } catch (\Exception $e) {
+            echo "Error: ", $e->getMessage(), "\n";
         }
-
-        $channel->close();
-        $connection->close();
     }
 }
 

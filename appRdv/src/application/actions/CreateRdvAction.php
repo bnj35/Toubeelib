@@ -86,7 +86,6 @@ class CreateRdvAction extends AbstractAction{
                     "patient" => ['href' => $urlPatient]
                 ]
             ];
-            return JsonRenderer::render($rs, 201, $response);
             //message queue
 
             $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
@@ -107,6 +106,8 @@ $channel->basic_publish($msg, '', 'notification_queue');
 
 $channel->close();
 $connection->close();
+
+return JsonRenderer::render($rs, 201, $response);
 
         }
         catch( RdvPraticienNotFoundException $e){
