@@ -102,8 +102,6 @@ return [
 
     ClassMail::class => function (ContainerInterface $c) {
         return new ClassMail(
-            $c->get(PraticienInfoServiceInterface::class),
-            $c->get(PatientInfoServiceInterface::class),
             $c->get(MailServiceInterface::class)
         );
     },

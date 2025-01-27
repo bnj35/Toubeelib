@@ -17,30 +17,37 @@ use PhpAmqpLib\Message\AMQPMessage;
 use toubeelib\core\service\mail\MailServiceInterface;
 use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 use toubeelib\core\services\patient\PatientInfoServiceInterface;
+use toubeelib\core\service\mail\MailService;
+
 
         try {
+            $mailService = new MailService();
+
             $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
             $channel = $connection->channel();
+            $channel->exchange_declare('notification_exchange', 'direct', false, true, false);
+            $channel->queue_declare('notification_queue', false, true, false, false, false);
+            $channel->queue_bind('notification_queue', 'notification_exchange');
 
-            $channel->basic_consume('notification_queue', '', false, false, false, false, $callback);
-
-            echo " [*] Waiting for messages. To exit press CTRL+C\n";
-
-            $callback = function($msg) {
+            $callback = function($msg) use ($mailService) {
                 $data = json_decode($msg->body, true);
-                echo " [x] Decoded details =>", " Praticien Id : ",$data['recipient']['praticienId']," Patient ID : ", $data['recipient']['patientId'],$data['recipient']['praticienMail'] "\n";
+                echo " [x] Decoded details =>", " Praticien Id : ",$data['recipient']['praticienId']," Patient ID : ", $data['recipient']['patientId'],$data['recipient']['praticienMail'], "\n";
                 
                 $praticienMail = $data['recipient']['praticienMail'];
                 $patientMail = $data['recipient']['patientMail'];
                 
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    $this->mailService->sendEmail($praticienMail, $data['event'], $data['details']);
-                    $this->mailService->sendEmail($patientMail, $data['event'], $data['details']);
+                    $mailService->sendEmail($praticienMail, $data['event'], $data['details']);
+                    $mailService->sendEmail($patientMail, $data['event'], $data['details']);
                     echo " [x] Sent email to Praticien and Patient\n";
                 } else {
                     echo "Error decoding JSON message\n";
                 }
             };
+
+            $channel->basic_consume('notification_queue', '', false, false, false, false, $callback);
+        
+            echo " [*] Waiting for messages. To exit press CTRL+C\n";
 
             while($channel->is_consuming()) {
                 $channel->wait();
@@ -51,5 +58,4 @@ use toubeelib\core\services\patient\PatientInfoServiceInterface;
         } catch (\Exception $e) {
             echo "Error: ", $e->getMessage(), "\n";
         }
-
 

@@ -21,17 +21,17 @@ class PDOPatientRepository implements PatientRepositoryInterface
     {
         try {
             if ($patient->getID() !== null) {
-                $stmt = $this->pdo->prepare("UPDATE patient SET adresse = :adresse, telephone = :telephone, email = :email WHERE id = :id");
+                $stmt = $this->pdo->prepare("UPDATE patient SET email = :email, adresse = :adresse, telephone = :telephone WHERE id = :id");
             } else {
                 $id = Uuid::uuid4()->toString();
                 $patient->setID($id);
-                $stmt = $this->pdo->prepare("INSERT INTO patient (id, adresse, telephone, email) VALUES (:id, :adresse, :telephone, :email)");
+                $stmt = $this->pdo->prepare("INSERT INTO patient (id, email, adresse, telephone) VALUES (:id, :email, :adresse, :telephone)");
             }
             $stmt->execute([
                 'id' => $patient->getID(),
+                'email' => $patient->getEmail(),
                 'adresse' => $patient->getAdresse(),
-                'telephone' => $patient->getTel(),
-                'email' => $patient->getEmail()
+                'telephone' => $patient->getTel()
             ]);
         } catch (\PDOException $e) {
             throw new RepositoryInternalServerError("Error while saving patient");
@@ -49,7 +49,7 @@ class PDOPatientRepository implements PatientRepositoryInterface
             if ($patient === false) {
                 throw new RepositoryEntityNotFoundException("Patient not found");
             }
-            $p = new Patient($patient['adresse'], $patient['telephone'], $patient['email']);
+            $p = new Patient($patient['email'], $patient['adresse'], $patient['telephone']);
             $p->setID($patient['id']);
             return $p;
         } catch (\PDOException $e) {

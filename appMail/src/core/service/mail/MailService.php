@@ -5,22 +5,20 @@ namespace toubeelib\core\service\mail;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Email;
-use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
-use toubeelib\core\services\patient\PatientInfoServiceInterface;
 
 class MailService implements MailServiceInterface {
-    private $praticienInfoService;
-    private $patientInfoService;
 
     public function __construct(
-        PraticienInfoServiceInterface $praticienInfoService,
-        PatientInfoServiceInterface $patientInfoService
     ) {
-        $this->praticienInfoService = $praticienInfoService;
-        $this->patientInfoService = $patientInfoService;
+        // Constructor can be used to initialize properties if needed
     }
 
     public function sendEmail($recipientEmail, $subject, $details) {
+        if ($recipientEmail === null) {
+            echo "Error: recipient email is null\n";
+            return;
+        }
+
         $email = (new Email())
             ->from('email@example.com')
             ->to($recipientEmail)

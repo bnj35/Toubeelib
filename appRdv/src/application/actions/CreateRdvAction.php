@@ -83,15 +83,6 @@ $response = [
     "type" => "resource",
     "locale" => "fr-FR",
     "rdv" => $rdv,
-    "praticien" => [
-        "id" => $praticien->id,
-        "email" => $praticien->email,
-        "nom" => $praticien->nom,
-        "prenom" => $praticien->prenom,
-        "adresse" => $praticien->adresse,
-        "tel" => $praticien->tel,
-        "specialite_label" => $praticien->specialite_label
-    ],
     "links" => [
         "self" => ['href' => $urlRDV],
         "praticien" => ['href' => $urlPraticien],
@@ -102,21 +93,23 @@ $response = [
 //message queue
 $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
 $channel = $connection->channel();
-$channel->queue_declare('notification_queue', false, false, false, false);
+$channel->exchange_declare('notification_exchange', 'direct', false, true, false);
+$channel->queue_declare('notification_queue', false, true, false, false, false);
+$channel->queue_bind('notification_queue', 'notification_exchange');
 
 $messageData = [
     'event' => 'CREATE',
     'recipient' => [
         'praticienId' => $rdv->praticienId,
         'patientId' => $rdv->patientId,
-        'praticienMail' => $praticien->email,
+        'praticienMail' => $praticien['email'],
         'patientMail' => $patient->email
     ],
     'details' => $rdv
 ];
 
-$msg = new AMQPMessage(json_encode($messageData));
-$channel->basic_publish($msg, '', 'notification_queue');
+$msg = new AMQPMessage(json_encode($messageData), ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
+$channel->basic_publish($msg, 'notification_exchange');
 
 $channel->close();
 $connection->close();

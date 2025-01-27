@@ -42,7 +42,7 @@ class ServiceRdv implements ServiceRdvInterface
                 throw new RdvPraticienNotFoundException();
             }
             $praticien = $this->praticienInfoService->getPraticienById($createRDVDTO->praticienId);
-            $specialitePraticien = $praticien['praticien']['specialite_label'];
+            $specialitePraticien = $praticien['specialite_label'];
 
             if ($createRDVDTO->specialite != $specialitePraticien) {
                 throw new RdvSpecialitePraticienDifferentException($createRDVDTO->specialite . '!=' . $specialitePraticien);
