@@ -25,18 +25,6 @@ class PatientService implements PatientServiceInterface
         $this->RdvRepository = $RdvRepository;
     }
 
-    public function createPatient(InputPatientDTO $p): PatientDTO
-    {
-        try{
-            $patient = new Patient($p->nom, $p->prenom, $p->adresse, $p->tel);
-            $this->patientRepository->save($patient);
-
-            return new PatientDTO($patient);
-        } catch (RepositoryInternalServerError $e) {
-            throw new ServicePatientInternalServerError($e->getMessage());
-        }
-
-    }
 
     public function getPatientById(string $id): PatientDTO
     {

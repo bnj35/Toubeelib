@@ -9,14 +9,16 @@ use toubeelib\core\dto\praticien\PraticienDTO;
 
 class Praticien extends Entity
 {
+    protected string $email;
     protected string $nom;
     protected string $prenom;
     protected string $adresse;
     protected string $tel;
     protected ?Specialite $specialite = null;
 
-    public function __construct(string $nom, string $prenom, string $adresse, string $tel)
+    public function __construct(string $email, string $nom, string $prenom, string $adresse, string $tel)
     {
+        $this->email = $email;
         $this->nom = $nom;
         $this->prenom = $prenom;
         $this->adresse = $adresse;
@@ -57,5 +59,10 @@ class Praticien extends Entity
     public function getTel(): string
     {
         return $this->tel;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 }

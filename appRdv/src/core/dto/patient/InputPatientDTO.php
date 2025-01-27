@@ -7,15 +7,13 @@ use toubeelib\core\dto\DTO;
 
 class InputPatientDTO extends DTO
 {
-    protected string $nom;
-    protected string $prenom;
+    protected string $email;
     protected string $adresse;
     protected string $tel;
 
 
-    public function __construct(string $nom, string $prenom, string $adresse, string $tel) {
-        $this->nom = $nom;
-        $this->prenom = $prenom;
+    public function __construct(string $email, string $adresse, string $tel) {
+        $this->email = $email;
         $this->adresse = $adresse;
         $this->tel = $tel;
     }

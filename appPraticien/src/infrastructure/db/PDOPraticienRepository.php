@@ -38,14 +38,15 @@ class PDOPraticienRepository implements PraticienRepositoryInterface
     {
         try{
             if ($praticien->getID() !== null) {
-                $stmt = $this->pdo->prepare("UPDATE praticien SET nom = :nom, prenom = :prenom, adresse = :adresse, telephone = :telephone, specialite_id = :specialite_id WHERE id = :id");
+                $stmt = $this->pdo->prepare("UPDATE praticien SET email = :email, nom = :nom, prenom = :prenom, adresse = :adresse, telephone = :telephone, specialite_id = :specialite_id WHERE id = :id");
             }else{
                 $id = Uuid::uuid4()->toString();
                 $praticien->setID($id);
-                $stmt = $this->pdo->prepare("INSERT INTO praticien (id, nom, prenom, adresse, telephone, specialite_id) VALUES (:id, :nom, :prenom, :adresse, :telephone, :specialite_id)");
+                $stmt = $this->pdo->prepare("INSERT INTO praticien (id, email, nom, prenom, adresse, telephone, specialite_id) VALUES (:id, :email, :nom, :prenom, :adresse, :telephone, :specialite_id)");
             }
             $stmt->execute([
                 'id' => $praticien->getID(),
+                'email' => $praticien->getEmail(),
                 'nom' => $praticien->getNom(),
                 'prenom' => $praticien->getPrenom(),
                 'adresse' => $praticien->getAdresse(),
@@ -67,7 +68,7 @@ class PDOPraticienRepository implements PraticienRepositoryInterface
             if ($praticien === false) {
                 throw new RepositoryEntityNotFoundException("Praticien not found");
             }
-            $p =  new Praticien($praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
+            $p =  new Praticien($praticien['email'], $praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
             $p->setID($praticien['id']);
             $p->setSpecialite($this->getSpecialiteById($praticien['specialite_id']));
             return $p;
@@ -84,7 +85,7 @@ class PDOPraticienRepository implements PraticienRepositoryInterface
             $praticiens = $query->fetchAll();
             $result = [];
             foreach ($praticiens as $praticien) {
-                $p = new Praticien($praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
+                $p = new Praticien($praticien['email'], $praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
                 $p->setID($praticien['id']);
                 $p->setSpecialite($this->getSpecialiteById($praticien['specialite_id']));
                 $result[] = $p;
@@ -103,7 +104,7 @@ class PDOPraticienRepository implements PraticienRepositoryInterface
             $praticiens = $query->fetchAll();
             $result = [];
             foreach ($praticiens as $praticien) {
-                $p = new Praticien($praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
+                $p = new Praticien($praticien['email'], $praticien['nom'], $praticien['prenom'], $praticien['adresse'], $praticien['telephone']);
                 $p->setID($praticien['id']);
                 $p->setSpecialite($this->getSpecialiteById($praticien['specialite_id']));
                 $result[] = $p;

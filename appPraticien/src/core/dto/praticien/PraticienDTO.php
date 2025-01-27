@@ -8,19 +8,21 @@ use toubeelib\core\dto\DTO;
 class PraticienDTO extends DTO
 {
     protected string $id;
-    protected string $prenom;
+    protected string $email;
     protected string $nom;
-    protected string $tel;
+    protected string $prenom;
     protected string $adresse;
+    protected string $tel;
     protected string $specialite_label;
 
     public function __construct(Praticien $p)
     {
         $this->id = $p->getID();
-        $this->prenom = $p->prenom;
+        $this->email = $p->email;
         $this->nom = $p->nom;
-        $this->tel = $p->tel;
+        $this->prenom = $p->prenom;
         $this->adresse = $p->adresse;
+        $this->tel = $p->tel;
         $this->specialite_label = $p->specialite->label;
     }
 }

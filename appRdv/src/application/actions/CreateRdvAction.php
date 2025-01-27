@@ -20,6 +20,8 @@ use toubeelib\core\services\rdv\RdvInternalServerError;
 use toubeelib\core\services\rdv\RdvNotFoundException;
 use toubeelib\core\services\rdv\RdvPraticienNotFoundException;
 use toubeelib\core\services\rdv\ServiceRdvInterface;
+use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
+use toubeelib\core\services\patient\PatientServiceInterface;
 //AMQP
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -27,9 +29,14 @@ use PhpAmqpLib\Message\AMQPMessage;
 class CreateRdvAction extends AbstractAction{
 
     private ServiceRdvInterface $RdvServiceInterface;
+    private PraticienInfoServiceInterface $praticienInfoService;
+    private PatientServiceInterface $patientService;
 
-    public function __construct(ServiceRdvInterface $RdvService){
+    public function __construct(ServiceRdvInterface $RdvService, PraticienInfoServiceInterface $praticienInfoService, PatientServiceInterface $patientService){
         $this->RdvServiceInterface = $RdvService;
+        $this->praticienInfoService = $praticienInfoService;
+        $this->patientService = $patientService;
+        
     }
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args) : ResponseInterface{
@@ -65,30 +72,35 @@ class CreateRdvAction extends AbstractAction{
 
             $rdv = $this->RdvServiceInterface->createRdv($dto);
 
-            $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
-            $urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
-            $urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
+$urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
+$urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
+$urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
 
-            $rdvArray = [
-                "id" => $rdv->id,
-                "date" => $rdv->date->format('Y-m-d H:i:s'),
-                "duree" => $rdv->duree,
-                "statut" => $rdv->statut
-            ];
+$praticien = $this->praticienInfoService->getPraticienById($rdv->praticienId);
+$patient = $this->patientService->getPatientById($rdv->patientId);
 
-            $response = [
-                "type" => "resource",
-                "locale" => "fr-FR",
-                "rdv" => $rdvArray,
-                "links" => [
-                    "self" => ['href' => $urlRDV],
-                    "praticien" => ['href' => $urlPraticien],
-                    "patient" => ['href' => $urlPatient]
-                ]
-            ];
-            //message queue
+$response = [
+    "type" => "resource",
+    "locale" => "fr-FR",
+    "rdv" => $rdv,
+    "praticien" => [
+        "id" => $praticien->id,
+        "email" => $praticien->email,
+        "nom" => $praticien->nom,
+        "prenom" => $praticien->prenom,
+        "adresse" => $praticien->adresse,
+        "tel" => $praticien->tel,
+        "specialite_label" => $praticien->specialite_label
+    ],
+    "links" => [
+        "self" => ['href' => $urlRDV],
+        "praticien" => ['href' => $urlPraticien],
+        "patient" => ['href' => $urlPatient]
+    ]
+];
 
-            $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
+//message queue
+$connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
 $channel = $connection->channel();
 $channel->queue_declare('notification_queue', false, false, false, false);
 
@@ -96,9 +108,11 @@ $messageData = [
     'event' => 'CREATE',
     'recipient' => [
         'praticienId' => $rdv->praticienId,
-        'patientId' => $rdv->patientId
+        'patientId' => $rdv->patientId,
+        'praticienMail' => $praticien->email,
+        'patientMail' => $patient->email
     ],
-    'details' => $rdvArray
+    'details' => $rdv
 ];
 
 $msg = new AMQPMessage(json_encode($messageData));
@@ -108,7 +122,6 @@ $channel->close();
 $connection->close();
 
 return JsonRenderer::render($rs, 201, $response);
-
         }
         catch( RdvPraticienNotFoundException $e){
             throw new HttpNotFoundException($rq, $e->getMessage());

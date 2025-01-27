@@ -33,18 +33,11 @@ class GetPraticienByIdAction extends AbstractAction
             $routeContext = RouteContext::fromRequest($rq);
             $routeParser = $routeContext->getRouteParser();
             $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $praticien->id]);
-            $praticienArray = [
-                "id" => $praticien->id,
-                "nom" => $praticien->nom,
-                "prenom" => $praticien->prenom,
-                "specialite_label" => $praticien->specialite_label,
-                "adresse" => $praticien->adresse,
-                "tel" => $praticien->tel
-            ];
+            
             $response = [
                 "type" => "resource",
                 "locale" => "fr-FR",
-                "praticien" => $praticienArray,
+                "praticien" => $praticien,
                 "links" => [
                     "self" => ['href' => $urlPraticien]
                 ]

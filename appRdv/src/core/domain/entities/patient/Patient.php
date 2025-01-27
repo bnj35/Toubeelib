@@ -7,29 +7,21 @@ use toubeelib\core\domain\entities\Entity;
 
 class Patient extends Entity
 {
-    protected string $nom;
-    protected string $prenom;
+    protected string $email;
     protected string $adresse;
     protected string $tel;
 
-    public function __construct(string $nom, string $prenom, string $adresse, string $tel)
+    public function __construct(string $email, string $adresse, string $tel)
     {
-        $this->nom = $nom;
-        $this->prenom = $prenom;
+        $this->email = $email;
         $this->adresse = $adresse;
         $this->tel = $tel;
     }
 
-    public function getNom(): string
+    public function getEmail(): string
     {
-        return $this->nom;
+        return $this->email;
     }
-
-    public function getPrenom(): string
-    {
-        return $this->prenom;
-    }
-
     public function getAdresse(): string
     {
         return $this->adresse;
@@ -40,14 +32,9 @@ class Patient extends Entity
         return $this->tel;
     }
 
-    public function setNom(string $nom): void
+    public function setEmail(string $email): void
     {
-        $this->nom = $nom;
-    }
-
-    public function setPrenom(string $prenom): void
-    {
-        $this->prenom = $prenom;
+        $this->email = $email;
     }
 
     public function setAdresse(string $adresse): void

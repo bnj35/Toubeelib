@@ -6,7 +6,7 @@ use toubeelib\core\services\praticien\ServicePraticien;
 use toubeelib\core\services\praticien\ServicePraticienInterface;
 use toubeelib\core\services\rdv\ServiceRdv;
 use toubeelib\core\services\rdv\ServiceRdvInterface;
-use toubeelib\core\services\patient\ServicePatient; 
+use toubeelib\core\services\patient\PatientService; 
 use toubeelib\core\services\patient\ServicePatientInterface; 
 use toubeelib\core\repositoryInterfaces\PraticienRepositoryInterface;
 use toubeelib\core\repositoryInterfaces\RdvRepositoryInterface;
@@ -124,9 +124,9 @@ return [
     },
 
     ServicePatientInterface::class => function (ContainerInterface $c) {
-        return new ServicePatient(
+        return new PatientService(
             $c->get(PatientRepositoryInterface::class),
-            $c->get(RdvRepositoryInterface::class),
+            $c->get(RdvRepositoryInterface::class)
         );
     },
 
@@ -149,6 +149,8 @@ return [
     CreateRdvAction::class => function (ContainerInterface $c) {
         return new CreateRdvAction(
             $c->get(ServiceRdvInterface::class),
+            $c->get(PraticienInfoServiceInterface::class),
+            $c->get(ServicePatientInterface::class)
         );
     },
 

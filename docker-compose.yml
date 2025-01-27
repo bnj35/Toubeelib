@@ -160,4 +160,4 @@ services:
       - toubeelib.db
       - rabbitmq
       - mailcatcher
-    command: php -S 0.0.0.0:80 -t /var/php/public
+    command: php -S 0.0.0.0:80 -t /var/php/public & php src/infrascructure/Http/MailHttp.php
