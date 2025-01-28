@@ -41,7 +41,7 @@ docker compose up
   "duree": 30,
   "praticienId": "PraticienID",
   "patientId": "PatientID",
-  "specialite": "Specialite"
+  "specialiteId": "Specialite_label" 
 }
 ```
 - `GET /praticiens/{praticien_id}/planning` : Récupérer le planning d'un praticien
