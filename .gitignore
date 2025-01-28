@@ -25,7 +25,4 @@ vendor/
 # Ignore all log files
 /app/logs/*.log
 
-auth.ini
-patient.ini
-praticien.ini
-rdv.ini
+/rabbitmq_dir/
