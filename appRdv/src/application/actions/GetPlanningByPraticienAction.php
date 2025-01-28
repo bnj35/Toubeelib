@@ -62,15 +62,15 @@ class GetPlanningByPraticienAction extends AbstractAction
             $routeContext = RouteContext::fromRequest($rq);
             $routeParser = $routeContext->getRouteParser();
             $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $praticienId]);
-            $urlDispobilites = $routeParser->urlFor('praticien_planning', ['praticien_id' => $praticienId]);
+            $urlPlanning = $routeParser->urlFor('praticien_planning', ['praticien_id' => $praticienId]);
 
-            $disponibilities = $this->RdvServiceInterface->getPlanningByPraticien($dto);
+            $Planning = $this->RdvServiceInterface->getPlanningByPraticien($dto);
             $result = [
                 "type" => "collection",
                 "locale" => "fr-FR",
-                "disponibilities" => $disponibilities,
+                "Planning" => $Planning,
                 "links" => [
-                    "self" => ["href" => $urlDispobilites],
+                    "self" => ["href" => $urlPlanning],
                     "praticien" => ["href" => $urlPraticien]
                 ]
             ];
