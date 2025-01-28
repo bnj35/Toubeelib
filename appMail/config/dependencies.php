@@ -47,12 +47,6 @@ return [
         return new Client(['base_uri' => 'http://api.praticien.toubeelib/']);
     },
 
-
-    //Repositories
-    PatientRepositoryInterface::class => function (ContainerInterface $c) {
-        return new PDOPatientRepository($c->get('patient.pdo'));
-    },
-
     
     //Services
     PraticienInfoServiceInterface::class => function (ContainerInterface $c) {
@@ -61,10 +55,6 @@ return [
 
     PatientInfoServiceInterface::class => function (ContainerInterface $c) {
         return new PatientInfoService($c->get('patient.pdo'));
-    },
-
-    ServiceAuthorizationPatientInterface::class => function (ContainerInterface $c) {
-        return new ServiceAuthorizationPatient();
     },
 
     MailServiceInterface::class => function (ContainerInterface $c) {
@@ -82,23 +72,6 @@ return [
         );
     },
 
-    //rdvs
-    GetRdvAction::class => function (ContainerInterface $c) {
-        return new GetRdvAction(
-            $c->get(ServiceRdvInterface::class),
-            $c->get(PraticienInfoServiceInterface::class)
-        );
-    },
-
-    CreateRdvAction::class => function (ContainerInterface $c) {
-        return new CreateRdvAction(
-            $c->get(ServiceRdvInterface::class),
-        );
-    },
-
-    GetPlanningByPraticienAction::class => function (ContainerInterface $c) {
-        return new GetPlanningByPraticienAction($c->get(ServiceRdvInterface::class));
-    },
 
     ClassMail::class => function (ContainerInterface $c) {
         return new ClassMail(
