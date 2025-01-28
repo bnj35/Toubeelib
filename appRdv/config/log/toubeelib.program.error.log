@@ -1,0 +1,3 @@
+[2025-01-12T17:34:53.880205+00:00] toubeelib.program.log.ERROR: RepositoryInternalServerError: Error while saving rdv [] []
+[2025-01-12T17:34:56.833192+00:00] toubeelib.program.log.ERROR: RepositoryInternalServerError: Error while saving rdv [] []
+[2025-01-24T12:06:38.280022+00:00] toubeelib.program.log.INFO: Praticien data {"praticien":{"type":"resource","locale":"fr-FR","praticien":[],"links":{"self":{"href":"/praticiens/d92d2a08-cc15-4888-87c4-5c5bbe8f1bfd"}}}} []

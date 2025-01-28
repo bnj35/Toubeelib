@@ -181,9 +181,11 @@ INSERT INTO "users" ("id", "email", "password", "role") VALUES
 ('fd774f03-935f-39f5-ba95-1e01feef28dd', 'test@test.com', 'testpass', 5);
 
 \c praticien_db
+
 --create table praticien
 DROP TABLE IF EXISTS "praticien";
 CREATE TABLE "public"."praticien" (
+    "email" character varying NOT NULL,
     "nom" character varying NOT NULL,
     "prenom" character varying NOT NULL,
     "adresse" text NOT NULL,
@@ -201,16 +203,17 @@ CREATE TABLE "public"."specialite" (
 ) WITH (oids = false);
 
 -- Insert sample data for praticien_db
-INSERT INTO praticien (nom, prenom, adresse, telephone, specialite_id) VALUES
-('Dupont', 'Jean', '123 Rue de Paris', '0123456789', '1'),
-('Martin', 'Marie', '456 Avenue de Lyon', '0987654321', '2');
-
 INSERT INTO specialite (label, description) VALUES
 ('Cardiologie', 'Spécialité médicale concernant le cœur et les vaisseaux sanguins'),
 ('Dermatologie', 'Spécialité médicale concernant la peau');
 
+INSERT INTO praticien (email, nom, prenom, adresse, telephone, specialite_id) VALUES
+('Dupont@Jean.com','Dupont', 'Jean', '123 Rue de Paris', '0123456789', (SELECT id FROM specialite WHERE label = 'Cardiologie')),
+('Martin@Marie.com','Martin', 'Marie', '456 Avenue de Lyon', '0987654321', (SELECT id FROM specialite WHERE label = 'Dermatologie'));
+
 -- Create tables and insert data for rdv_db
 \c rdv_db
+
 DROP TABLE IF EXISTS "rdv";
 CREATE TABLE rdv (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -223,20 +226,19 @@ CREATE TABLE rdv (
 );
 -- Insert sample data for rdv_db
 INSERT INTO rdv ( patient_id, praticien_id, duree, specialite_id, rdv_date, status) VALUES
-('35404a92-24ad-4cce-bd5e-a51e257f9787', 'd92d2a08-cc15-4888-87c4-5c5bbe8f1bfd',60 ,'9f6d8761-0004-4d41-ad53-09d201fccc85', '2023-10-01 10:00:00', 'scheduled'),
-('4d067207-99ee-445e-9399-37435a602fdd', '22d6c86e-261c-4f7a-9c36-8cbcbe87572d',30 ,'fdbe55f8-4bdd-4095-8cae-1946e9e9486b', '2023-10-02 11:00:00', 'completed');
+('35404a92-24ad-4cce-bd5e-a51e257f9787', 'd92d2a08-cc15-4888-87c4-5c5bbe8f1bfd',60 ,'Cardiologie', '2023-10-01 10:00:00', 'scheduled'),
+('4d067207-99ee-445e-9399-37435a602fdd', '22d6c86e-261c-4f7a-9c36-8cbcbe87572d',30 ,'Radiologie', '2023-10-02 11:00:00', 'completed');
 
 -- Create tables and insert data for patient_db
 \c patient_db
 DROP TABLE IF EXISTS "patient";
 CREATE TABLE "public"."patient" (
-    "nom" character varying NOT NULL,
-    "prenom" character varying NOT NULL,
+    "email" character varying NOT NULL,
     "adresse" text NOT NULL,
     "telephone" character varying NOT NULL,
     "id" uuid DEFAULT gen_random_uuid() NOT NULL
 ) WITH (oids = false);
 -- Insert sample data for patient_db
-INSERT INTO patient (nom, prenom, adresse, telephone) VALUES
-('Doe', 'John', '123 Main St', '555-1234'),
-('Smith', 'Jane', '456 Elm St', '555-5678');
+INSERT INTO patient (email, adresse, telephone) VALUES
+('Doe@John.com', '123 Main St', '555-1234'),
+('Smith@Jane.com', '456 Elm St', '555-5678');
