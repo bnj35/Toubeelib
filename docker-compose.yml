@@ -7,7 +7,7 @@ services:
   # service api.toubeelib : api pour la prise de rdv
   #
   api.toubeelib:
-  #  image: 'canals/php:8.3-cli'
+    #  image: 'canals/php:8.3-cli'
     build:
       context: build
       dockerfile: 8.3-cli.Dockerfile
@@ -55,10 +55,11 @@ services:
       - toubeelib.net
     depends_on:
       - toubeelib.db
+      - rabbitmq
     command: php -S 0.0.0.0:80 -t /var/php/public
 
-  # service api.user.toubeelib : micro-service pour la gestion des utilisateurs
-  api.user.toubeelib:
+  # service api.auth.toubeelib : micro-service pour la gestion des utilisateurs
+  api.auth.toubeelib:
     build:
       context: build
       dockerfile: 8.3-cli.Dockerfile
@@ -66,7 +67,7 @@ services:
     ports:
       - '6083:80'
     volumes:
-      - ./appUser:/var/php
+      - ./appAuth:/var/php
     working_dir: /var/php
     networks:
       - toubeelib.net
@@ -83,7 +84,7 @@ services:
     networks:
       - toubeelib.net
     volumes:
-      - ./app/sql:/var/sql'
+      - ./app/sql:/var/sql
 
   # service administration des bases sql
   adminer:
@@ -110,5 +111,52 @@ services:
       - toubeelib.db
       - api.praticien.toubeelib
       - api.rdv.toubeelib
-      - api.user.toubeelib
+      - api.auth.toubeelib
+      - rabbitmq
     command: php -S 0.0.0.0:80 -t /var/php/public
+
+  # service rabbitmq pour la gestion des messages
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    networks:
+      - toubeelib.net
+    volumes:
+      - ./rabbitmq_dir:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 8s
+      timeout: 30s
+      retries: 3
+
+  # service mailcatcher : pour tester l'envoi de mails
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - '1080:1080'
+      - '1025:1025'
+    networks:
+      - toubeelib.net
+
+  # service api.mail.toubeelib : micro-service pour la gestion des mails
+  api.mail.toubeelib:
+    build:
+      context: build
+      dockerfile: 8.3-cli.Dockerfile
+    env_file: ./toubeelib.env
+    ports:
+      - '6084:80'
+    volumes:
+      - ./appMail:/var/php
+    working_dir: /var/php
+    networks:
+      - toubeelib.net
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: php /var/php/src/infrastructure/Http/MailHttp.php

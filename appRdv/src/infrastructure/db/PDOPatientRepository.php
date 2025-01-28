@@ -19,42 +19,40 @@ class PDOPatientRepository implements PatientRepositoryInterface
 
     public function save(Patient $patient): string
     {
-        try{
+        try {
             if ($patient->getID() !== null) {
-                $stmt = $this->pdo->prepare("UPDATE patient SET nom = :nom, prenom = :prenom, adresse = :adresse, tel = :tel WHERE id = :id");
-            }else{
+                $stmt = $this->pdo->prepare("UPDATE patient SET email = :email, adresse = :adresse, telephone = :telephone WHERE id = :id");
+            } else {
                 $id = Uuid::uuid4()->toString();
                 $patient->setID($id);
-                $stmt = $this->pdo->prepare("INSERT INTO patient (id, nom, prenom, adresse, tel) VALUES (:id, :nom, :prenom, :adresse, :tel)");
+                $stmt = $this->pdo->prepare("INSERT INTO patient (id, email, adresse, telephone) VALUES (:id, :email, :adresse, :telephone)");
             }
             $stmt->execute([
                 'id' => $patient->getID(),
-                'nom' => $patient->getNom(),
-                'prenom' => $patient->getPrenom(),
+                'email' => $patient->getEmail(),
                 'adresse' => $patient->getAdresse(),
-                'tel' => $patient->getTel()
+                'telephone' => $patient->getTel()
             ]);
-        }catch (\PDOException $e){
+        } catch (\PDOException $e) {
             throw new RepositoryInternalServerError("Error while saving patient");
         }
 
         return $patient->getID();
-
     }
 
     public function getPatientById(string $id): Patient
     {
-        try{
+        try {
             $stmt = $this->pdo->prepare("SELECT * FROM patient WHERE id = :id");
             $stmt->execute(['id' => $id]);
             $patient = $stmt->fetch();
             if ($patient === false) {
                 throw new RepositoryEntityNotFoundException("Patient not found");
             }
-            $p =  new Patient($patient['nom'], $patient['prenom'], $patient['adresse'], $patient['tel']);
+            $p = new Patient($patient['email'], $patient['adresse'], $patient['telephone']);
             $p->setID($patient['id']);
             return $p;
-        }catch (\PDOException $e){
+        } catch (\PDOException $e) {
             throw new RepositoryInternalServerError("Error while fetching patient");
         }
     }

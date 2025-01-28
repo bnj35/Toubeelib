@@ -20,13 +20,23 @@ use toubeelib\core\services\rdv\RdvInternalServerError;
 use toubeelib\core\services\rdv\RdvNotFoundException;
 use toubeelib\core\services\rdv\RdvPraticienNotFoundException;
 use toubeelib\core\services\rdv\ServiceRdvInterface;
+use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
+use toubeelib\core\services\patient\PatientServiceInterface;
+//AMQP
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class CreateRdvAction extends AbstractAction{
 
     private ServiceRdvInterface $RdvServiceInterface;
+    private PraticienInfoServiceInterface $praticienInfoService;
+    private PatientServiceInterface $patientService;
 
-    public function __construct(ServiceRdvInterface $RdvService){
+    public function __construct(ServiceRdvInterface $RdvService, PraticienInfoServiceInterface $praticienInfoService, PatientServiceInterface $patientService){
         $this->RdvServiceInterface = $RdvService;
+        $this->praticienInfoService = $praticienInfoService;
+        $this->patientService = $patientService;
+        
     }
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args) : ResponseInterface{
@@ -62,22 +72,51 @@ class CreateRdvAction extends AbstractAction{
 
             $rdv = $this->RdvServiceInterface->createRdv($dto);
 
-            $urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
-            $urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
-            $urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
+$urlPraticien = $routeParser->urlFor('praticienId', ['id' => $rdv->praticienId]);
+$urlPatient = $routeParser->urlFor('patientId', ['id' => $rdv->patientId]);
+$urlRDV = $routeParser->urlFor('rdvId', ['id' => $rdv->id]);
 
-            $response = [
-                "type" => "resource",
-                "locale" => "fr-FR",
-                "rdv" => $rdv,
-                "links" => [
-                    "self" => ['href' => $urlRDV],
-                    "praticien" => ['href' => $urlPraticien],
-                    "patient" => ['href' => $urlPatient]
-                ]
-            ];
+$praticien = $this->praticienInfoService->getPraticienById($rdv->praticienId);
+$patient = $this->patientService->getPatientById($rdv->patientId);
 
-            return JsonRenderer::render($rs, 201, $response);
+$response = [
+    "type" => "resource",
+    "locale" => "fr-FR",
+    "rdv" => $rdv,
+    "links" => [
+        "self" => ['href' => $urlRDV],
+        "praticien" => ['href' => $urlPraticien],
+        "patient" => ['href' => $urlPatient]
+    ]
+];
+
+//message queue
+if ($response != null) {
+$connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
+$channel = $connection->channel();
+$channel->exchange_declare('notification_exchange', 'direct', false, true, false);
+$channel->queue_declare('notification_queue', false, true, false, false, false);
+$channel->queue_bind('notification_queue', 'notification_exchange');
+
+$messageData = [
+    'event' => 'CREATE',
+    'recipient' => [
+        'praticienId' => $rdv->praticienId,
+        'patientId' => $rdv->patientId,
+        'praticienMail' => $praticien['email'],
+        'patientMail' => $patient->email
+    ],
+    'details' => " date: ".$rdv->date->format('Y-m-d H:i:s')." durée: ".$rdv->duree." specialite: ".$rdv->speciality
+];
+
+$msg = new AMQPMessage(json_encode($messageData), ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
+$channel->basic_publish($msg, 'notification_exchange');
+
+$channel->close();
+$connection->close();
+};
+
+return JsonRenderer::render($rs, 201, $response);
         }
         catch( RdvPraticienNotFoundException $e){
             throw new HttpNotFoundException($rq, $e->getMessage());

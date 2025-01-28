@@ -18,7 +18,9 @@ class PraticienInfoService implements PraticienInfoServiceInterface
     {
         try {
             $response = $this->client->get("/praticiens/{$id}");
-            return json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody()->getContents(), true);
+            $praticien = $data['praticien'];
+            return $praticien;
         } catch (\Exception $e) {
             return [
                 'error' => 'Praticien not found',
@@ -26,4 +28,5 @@ class PraticienInfoService implements PraticienInfoServiceInterface
             ];
         }
     }
+
 }

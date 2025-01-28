@@ -10,15 +10,13 @@ use toubeelib\core\dto\DTO;
 class PatientDTO extends DTO
 {
     protected string $id;
-    protected string $nom;
-    protected string $prenom;
+    protected string $email;
     protected string $adresse;
     protected string $tel;
 
     public function __construct(Patient $pa) {
         $this->id = $pa->getID();
-        $this->nom = $pa->nom;
-        $this->prenom = $pa->prenom;
+        $this->email = $pa->email;
         $this->adresse = $pa->adresse;
         $this->tel = $pa->tel;
     }

@@ -18,6 +18,8 @@ use toubeelib\core\repositoryInterfaces\RepositoryEntityNotFoundException;
 use toubeelib\core\repositoryInterfaces\RepositoryInternalServerError;
 use toubeelib\core\services\praticien\PraticienInfoServiceInterface;
 
+
+
 class ServiceRdv implements ServiceRdvInterface
 {
     private PraticienInfoServiceInterface $praticienInfoService;
@@ -40,7 +42,7 @@ class ServiceRdv implements ServiceRdvInterface
                 throw new RdvPraticienNotFoundException();
             }
             $praticien = $this->praticienInfoService->getPraticienById($createRDVDTO->praticienId);
-            $specialitePraticien = $praticien['specialite'];
+            $specialitePraticien = $praticien['specialite_label'];
 
             if ($createRDVDTO->specialite != $specialitePraticien) {
                 throw new RdvSpecialitePraticienDifferentException($createRDVDTO->specialite . '!=' . $specialitePraticien);
