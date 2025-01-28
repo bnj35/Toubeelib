@@ -157,7 +157,6 @@ services:
     networks:
       - toubeelib.net
     depends_on:
-      - toubeelib.db
-      - rabbitmq
-      - mailcatcher
-    command: php -S 0.0.0.0:80 -t /var/php/public & php src/infrascructure/Http/MailHttp.php
+      rabbitmq:
+        condition: service_healthy
+    command: php /var/php/src/infrastructure/Http/MailHttp.php

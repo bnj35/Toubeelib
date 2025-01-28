@@ -203,13 +203,13 @@ CREATE TABLE "public"."specialite" (
 ) WITH (oids = false);
 
 -- Insert sample data for praticien_db
-INSERT INTO praticien (email, nom, prenom, adresse, telephone, specialite_id) VALUES
-('Dupont@Jean.com','Dupont', 'Jean', '123 Rue de Paris', '0123456789', '1'),
-('Martin@Marie.com','Martin', 'Marie', '456 Avenue de Lyon', '0987654321', '2');
-
 INSERT INTO specialite (label, description) VALUES
 ('Cardiologie', 'Spécialité médicale concernant le cœur et les vaisseaux sanguins'),
 ('Dermatologie', 'Spécialité médicale concernant la peau');
+
+INSERT INTO praticien (email, nom, prenom, adresse, telephone, specialite_id) VALUES
+('Dupont@Jean.com','Dupont', 'Jean', '123 Rue de Paris', '0123456789', (SELECT id FROM specialite WHERE label = 'Cardiologie')),
+('Martin@Marie.com','Martin', 'Marie', '456 Avenue de Lyon', '0987654321', (SELECT id FROM specialite WHERE label = 'Dermatologie'));
 
 -- Create tables and insert data for rdv_db
 \c rdv_db

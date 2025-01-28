@@ -91,6 +91,7 @@ $response = [
 ];
 
 //message queue
+if ($response != null) {
 $connection = new AMQPStreamConnection('rabbitmq', 5672, 'admin', 'admin');
 $channel = $connection->channel();
 $channel->exchange_declare('notification_exchange', 'direct', false, true, false);
@@ -105,7 +106,7 @@ $messageData = [
         'praticienMail' => $praticien['email'],
         'patientMail' => $patient->email
     ],
-    'details' => $rdv
+    'details' => " date: ".$rdv->date->format('Y-m-d H:i:s')." durée: ".$rdv->duree." specialite: ".$rdv->speciality
 ];
 
 $msg = new AMQPMessage(json_encode($messageData), ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
@@ -113,6 +114,7 @@ $channel->basic_publish($msg, 'notification_exchange');
 
 $channel->close();
 $connection->close();
+};
 
 return JsonRenderer::render($rs, 201, $response);
         }
